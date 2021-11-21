@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".view.online.fragment.MusicOnline">
+
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tablayout"
+        app:tabTextColor="@color/white"
+        app:tabIndicatorColor="#ff0"
+        android:background="@android:color/transparent"
+        app:tabSelectedTextColor="#ff0"
+        app:tabIconTint="@color/custom_color_bottom_navi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>
