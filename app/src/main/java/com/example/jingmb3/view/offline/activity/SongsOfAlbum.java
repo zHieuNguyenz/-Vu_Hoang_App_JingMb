@@ -57,7 +57,7 @@ public class SongsOfAlbum extends AppCompatActivity {
             public void onClick(View view) {
                 setResult(23);
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
         ListSong=new ArrayList<>();

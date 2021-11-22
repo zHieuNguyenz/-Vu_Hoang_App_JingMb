@@ -211,7 +211,7 @@ public class MyAlbum extends Fragment {
         Intent intent=new Intent(getActivity(), SongsOfAlbum.class);
         intent.putExtra("IdAlbum",myListAlbum.get(position).getId_album());
         startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+        getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
     }
 
     private void ArrangeSong(ArrayList<MySongObject> myListSong){
