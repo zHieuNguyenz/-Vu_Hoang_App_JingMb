@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -57,7 +56,7 @@ public class MyArtistAdapter extends RecyclerView.Adapter<MyArtistAdapter.ViewHo
                 Bitmap bitmap=BitmapFactory.decodeByteArray(myArtistObject.getImageArtist(),0,
                         myArtistObject.getImageArtist().length);
                 holder.imageArtist.setImageBitmap(bitmap);
-            }
+            }else holder.imageArtist.setImageResource(R.drawable.icon_artist);
             holder.layoutItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

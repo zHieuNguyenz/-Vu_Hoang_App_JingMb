@@ -28,11 +28,11 @@ public class MyAlbumObject {
     @ColumnInfo(name = "Danh sách bài hát")
     private ArrayList<String> id_song=null;
 
+    public MyAlbumObject(){}
     public MyAlbumObject(String nameAlbum, byte[] imageAlbum, String nameArstist) {
         this.nameAlbum = nameAlbum;
         this.imageAlbum = imageAlbum;
         this.nameArstist = nameArstist;
-
     }
 
     public int getId_album() {

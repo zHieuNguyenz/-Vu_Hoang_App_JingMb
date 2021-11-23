@@ -1,18 +1,14 @@
 package com.example.jingmb3.view.offline.fragment;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,40 +16,39 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
-import android.widget.MultiAutoCompleteTextView;
-import android.widget.Toast;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentMyMusicBinding;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.activity.MainActivity;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
-import com.example.jingmb3.view.offline.activity.Search;
-import com.example.jingmb3.view.offline.fragment.MyMusicViewPagerAdapter;
-import com.google.android.material.tabs.TabLayout;
+import com.example.jingmb3.view.activity.adapter.MyMusicViewPagerAdapter;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.MultiplePermissionsReport;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Random;
 
 
 public class MyMusic extends Fragment {
 
     private FragmentMyMusicBinding binding;
+
     private int position=0;
     private ArrayList<MySongObject> myListSong;
     private MySongObject mySongObject;
     private Bitmap bitmap=null;
+    public static boolean pressMiniPlay=false;
+
+    public static void setPressMiniPlay(boolean pressMiniPlay) {
+        MyMusic.pressMiniPlay = pressMiniPlay;
+    }
+
+    public static boolean isPressMiniPlay() {
+        return pressMiniPlay;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,6 +84,8 @@ public class MyMusic extends Fragment {
             }
         }).attach();
         binding.miniSName.setSelected(true);
+
+        //Sự kiện nhấn vào nút chơi nhạc của Mini Play
         binding.playBtnMini.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -96,6 +93,7 @@ public class MyMusic extends Fragment {
                     binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
                     MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),
                             mySongObject.getLinkSong(),position);
+                    MyMediaPlayer.getInstance().Start();
                     MyMediaPlayer.getInstance().setStopMedia();
                 }
                 else if(MyMediaPlayer.getInstance().chechMedia()){
@@ -113,12 +111,14 @@ public class MyMusic extends Fragment {
                         binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
                         MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),
                                 mySongObject.getLinkSong(),position);
+                        MyMediaPlayer.getInstance().Start();
                         imageAnimation();
                     }
                 }
             }
         });
 
+        //Sự kiện nhấn vào nút chuyển đổi sang bài hát tiếp theo của Mini Play
         binding.nextBtnMini.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,14 +130,15 @@ public class MyMusic extends Fragment {
                     RandomPlay();
                     return;
                 }
-                MyMediaPlayer.getInstance().stopAudioFile();
+                if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
                 MyMediaPlayer.getInstance().setStopMedia();
-                imageAnimation();
                 loadData();
                 binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
+                imageAnimation();
                 position=((position+1)%myListSong.size());
                 mySongObject=myListSong.get(position);
-                MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMediaPlayer.getInstance().playAudioFile(getContext(),myListSong.get(position).getLinkSong(),position);
+                MyMediaPlayer.getInstance().Start();
                 mediaComplete();
                 binding.miniSName.setText(mySongObject.getNameSong());
                 binding.miniArtist.setText(mySongObject.getNameArtist());
@@ -147,6 +148,8 @@ public class MyMusic extends Fragment {
             }
         });
 
+
+        //Sự kiện nhấn vào nút chuyển đổi sang bài hát trước của Mini Play
         binding.prevBtnMini.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -158,7 +161,7 @@ public class MyMusic extends Fragment {
                     RandomPlay();
                     return;
                 }
-                MyMediaPlayer.getInstance().stopAudioFile();
+                if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
                 MyMediaPlayer.getInstance().setStopMedia();
                 imageAnimation();
                 binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
@@ -166,6 +169,7 @@ public class MyMusic extends Fragment {
                 position=((position-1)<0?(myListSong.size()-1):position-1);
                 mySongObject=myListSong.get(position);
                 MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMediaPlayer.getInstance().Start();
                 mediaComplete();
                 binding.miniSName.setText(mySongObject.getNameSong());
                 binding.miniArtist.setText(mySongObject.getNameArtist());
@@ -175,11 +179,14 @@ public class MyMusic extends Fragment {
             }
         });
 
+
+        //Sự kiện khi nhấn vào Mini Play sẽ chuyển sang màn hình chơi nhạc
         binding.miniPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pressMiniPlay=true;
                 Intent intent=new Intent(getActivity(), PlayerSong.class);
-                intent.putExtra("pos",position);
+                intent.putExtra("pos",MyMediaPlayer.getInstance().getPosition());
                 startActivityForResult(intent,23);
                 getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
             }
@@ -194,10 +201,13 @@ public class MyMusic extends Fragment {
         loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
 
     }
+
+    //Hàm thực hiện hiển thị thông tin, chức năng Mini Play
     public void loadMiniPlayer(int position){
         if(!MyMediaPlayer.getInstance().getListPlaySong().isEmpty()){
-            loadData();;
+            loadData();
         }
+        else loadData();
         if(myListSong.isEmpty()){
             HideMiniPlayer();
             return;
@@ -230,6 +240,7 @@ public class MyMusic extends Fragment {
         }
     }
 
+    //Sắp xếp danh sách nhạc theo thứ tự
     public void Arrange(){
         Collections.sort(myListSong, new Comparator<MySongObject>() {
             @Override
@@ -248,11 +259,15 @@ public class MyMusic extends Fragment {
         Arrange();
     }
 
+    //Chế độ lặp lại 1 bài hát
     private void repeatSong(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
         loadData();
         MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
+        binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
+        imageAnimation();
         mediaComplete();
         binding.miniSName.setText(myListSong.get(position).getNameSong());
         binding.miniArtist.setText(myListSong.get(position).getNameArtist());
@@ -260,6 +275,8 @@ public class MyMusic extends Fragment {
                 0,myListSong.get(position).getImageSong().length);
         binding.imgSongMini.setImageBitmap(bitmap);
     }
+
+    //Chế độ phát ngẫu nhiên
     private void RandomPlay(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
@@ -271,6 +288,9 @@ public class MyMusic extends Fragment {
         }while(valueRandom==position);
         position=valueRandom;
         MyMediaPlayer.getInstance().playAudioFile(getActivity().getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
+        binding.playBtnMini.setImageResource(R.drawable.ic_pause_mini);
+        imageAnimation();
         mediaComplete();
         binding.miniSName.setText(myListSong.get(position).getNameSong());
         binding.miniArtist.setText(myListSong.get(position).getNameArtist());
@@ -279,10 +299,12 @@ public class MyMusic extends Fragment {
         binding.imgSongMini.setImageBitmap(bitmap);
     }
 
+    //Ẩn Mini Play khi không có bài hát nào
     public void HideMiniPlayer(){
         binding.miniPlay.setVisibility(View.INVISIBLE);
     }
 
+    //Hàm thực hiện việc phát bài hát tiếp theo khi bài hát hiện tại đã kết thúc
     public void mediaComplete(){
         MyMediaPlayer.getInstance().getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -290,6 +312,8 @@ public class MyMusic extends Fragment {
                 mediaPlayer.stop();
                 mediaPlayer.reset();
                 loadData();
+
+                //Kiểm tra chế độ lặp lại và ngẫu nhiên
                 if(MyMediaPlayer.getInstance().isCheckRepeat()){
                     repeatSong();
                     return;
@@ -298,6 +322,8 @@ public class MyMusic extends Fragment {
                     RandomPlay();
                     return;
                 }
+
+                //Chuyển phát bài hát tiếp theo của danh sách chơi nhạc
                 binding.nextBtnMini.performClick();
             }
         });
@@ -324,6 +350,8 @@ public class MyMusic extends Fragment {
             mediaComplete();
         }
     }
+
+    //Hiệu ứng ảnh quay tròn
     public void imageAnimation(){
         RotateAnimation rotateAnimation = new RotateAnimation(0, 360f,
                 Animation.RELATIVE_TO_SELF, 0.5f,
@@ -336,6 +364,8 @@ public class MyMusic extends Fragment {
         binding.imgSongMini.startAnimation(rotateAnimation);
     }
 
+
+    //Load lại mini play khi trở lại màn hình chính
     @Override
     public void onResume() {
         super.onResume();

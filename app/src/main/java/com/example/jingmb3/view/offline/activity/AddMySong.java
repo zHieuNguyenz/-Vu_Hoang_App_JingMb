@@ -21,6 +21,9 @@ import com.example.jingmb3.model.offline.MySongsDatabase;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class AddMySong extends AppCompatActivity {
 
@@ -38,7 +41,7 @@ public class AddMySong extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
 
@@ -86,11 +89,49 @@ public class AddMySong extends AppCompatActivity {
             myArtistObject.setNameArtist(artist);
             MyArtistDatabase.getInstance(this).myArtistDAO().insertArtist(myArtistObject);
         }
+
         MySongObject mySongObject=new MySongObject(name,artist,ImageView_to_Byte(),uri);
         MySongsDatabase.getInstance(this).mySongsDAO().insertSong(mySongObject);
+
+        if(MyArtistDatabase.getInstance(this).myArtistDAO().getListNameArtist().contains(artist)&&
+        MyMediaPlayer.getInstance().isCheckSongArtist()){
+            if(MyArtistDatabase.getInstance(this).myArtistDAO().getArtistById(MyMediaPlayer.getInstance().getIdArtist()).getNameArtist()
+            .equals(artist)){
+                ArrayList<MySongObject> listSong= MyMediaPlayer.getInstance().getListPlaySong();
+                listSong.add(mySongObject);
+                Arrange(listSong);
+                MyMediaPlayer.getInstance().setListPlaySong(listSong);
+                for(int i=0;i<listSong.size();i++){
+                    if(listSong.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                        MyMediaPlayer.getInstance().setPosition(i);
+                        break;
+                    }
+                }
+            }
+        }
+        else if(!MyMediaPlayer.getInstance().isCheckSongAlbum() && !MyMediaPlayer.getInstance().isCheckFavSong()){
+            ArrayList<MySongObject> listSong= (ArrayList<MySongObject>) MySongsDatabase.getInstance(this).mySongsDAO().getListSong();
+            Arrange(listSong);
+            MyMediaPlayer.getInstance().setListPlaySong(listSong);
+            for(int i=0;i<listSong.size();i++){
+                if(listSong.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                    MyMediaPlayer.getInstance().setPosition(i);
+                    break;
+                }
+            }
+        }
         setResult(Activity.RESULT_OK);
         finish();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
+    }
+
+    private void Arrange(ArrayList<MySongObject> listSong) {
+        Collections.sort(listSong, new Comparator<MySongObject>() {
+            @Override
+            public int compare(MySongObject mySongObject, MySongObject t1) {
+                return mySongObject.getNameSong().compareToIgnoreCase(t1.getNameSong());
+            }
+        });
     }
 
     private void Camera(){
@@ -142,6 +183,6 @@ public class AddMySong extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 }

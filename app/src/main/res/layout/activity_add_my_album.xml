@@ -90,17 +90,4 @@
         android:layout_width="330dp"
         android:layout_height="wrap_content"/>
 
-    <EditText
-        android:id="@+id/inArtistAlbum"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center_horizontal"
-        android:inputType="text"
-        android:backgroundTint="#D8D0E8"
-        android:hint="Nhập tên nghệ sĩ"
-        android:textSize="20sp"
-        android:textColor="@color/white"
-        android:textColorHint="#D8D0E8"
-        android:layout_width="330dp"
-        android:layout_height="wrap_content"/>
-
 </LinearLayout>

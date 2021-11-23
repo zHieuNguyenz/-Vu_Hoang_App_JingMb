@@ -50,10 +50,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(mCurrentFragment==MUSIC_ONLINE){
                     Intent intent=new Intent(MainActivity.this, SearchOnline.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 }
                 else{
                     Intent intent=new Intent(MainActivity.this, Search.class);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 }
             }
         });

@@ -14,14 +14,12 @@ import android.view.ViewGroup;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentSearchMyAlbumBinding;
-import com.example.jingmb3.databinding.FragmentSearchMySongBinding;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
 import com.example.jingmb3.view.offline.activity.Search;
 import com.example.jingmb3.view.offline.activity.SongsOfAlbum;
-import com.example.jingmb3.view.offline.adapter.SearchMyAlbumAdapter;
-import com.example.jingmb3.view.offline.adapter.SearchMyArtistAdapter;
-import com.example.jingmb3.view.offline.adapter.SearchMySongAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMyAlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +57,7 @@ public class SearchMyAlbum extends Fragment {
                 Intent intent=new Intent(getActivity(), SongsOfAlbum.class);
                 intent.putExtra("IdAlbum",SearchMyAlbumAdapter.getInstance().getListAlbum().get(position).getId_album());
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
             }
         });
     }
@@ -69,17 +67,25 @@ public class SearchMyAlbum extends Fragment {
     }
 
     public void loadData(){
-        listAlbum= (ArrayList<MyAlbumObject>) MyAlbumDatabase.getInstance(getContext()).myAlbumDAO().getMyAlbum();
-        Arrange(listAlbum);
+        listAlbum= ListSearch.getInstance().getListAlbum();
         SearchMyAlbumAdapter.getInstance().setData(listAlbum);
     }
 
-    public void Arrange(ArrayList<MyAlbumObject> listAlbum){
-        Collections.sort(listAlbum, new Comparator<MyAlbumObject>() {
-            @Override
-            public int compare(MyAlbumObject myAlbumObject, MyAlbumObject t1) {
-                return myAlbumObject.getNameAlbum().compareToIgnoreCase(t1.getNameAlbum());
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(ListSearch.getInstance().isCheckUpdateListAlbum()){
+            ListSearch.getInstance().setCheckUpdateListAlbum(false);
+            loadData();
+            ArrayList<MyAlbumObject> arrayList=new ArrayList<>();
+            for(MyAlbumObject myAlbumObject :listAlbum){
+                if(myAlbumObject.getNameAlbum().toLowerCase().contains(Search.getBinding().search
+                        .getQuery().toString().trim().toLowerCase()))
+                    arrayList.add(myAlbumObject);
             }
-        });
+            SearchMyAlbumAdapter.getInstance().setListAlbum(arrayList);
+            SearchMyAlbumAdapter.getInstance().notifyDataSetChanged();
+        }
     }
 }

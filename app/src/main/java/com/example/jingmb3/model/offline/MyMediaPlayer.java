@@ -15,6 +15,7 @@ public class MyMediaPlayer {
     int position=0;
     int IdAlbum;
     int IdArtist;
+    int IdSong=-1;
     boolean PlayAlbum=false;
     boolean checkFavSong=false;
     boolean checkSongArtist=false;
@@ -22,6 +23,7 @@ public class MyMediaPlayer {
     boolean checkRandom=false;
     boolean checkRepeat=false;
     boolean checkSongAlbum=false;
+
 
     public static MyMediaPlayer getInstance(){
         if(Instance==null){
@@ -32,6 +34,10 @@ public class MyMediaPlayer {
     public void playAudioFile(Context context, String uri, int position){
         mediaPlayer=MediaPlayer.create(context,Uri.parse(uri));
         this.position=position;
+        this.IdSong=ListPlaySong.get(position).getId_song();
+    }
+
+    public void Start(){
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -54,10 +60,8 @@ public class MyMediaPlayer {
         }
     }
     public boolean chechMedia(){
-        if(mediaPlayer!=null){
-        if(mediaPlayer.isPlaying())
+        if(mediaPlayer!=null && mediaPlayer.isPlaying())
             return true;
-        else return false;}
         else return false;
     }
     public MediaPlayer getMediaPlayer(){
@@ -69,8 +73,17 @@ public class MyMediaPlayer {
     public boolean isCheckStopMedia(){
         return checkStopMedia;
     }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     public int getPosition(){
         return position;
+    }
+
+    public int getIdSong() {
+        return IdSong;
     }
 
     public boolean isCheckRandom() {

@@ -17,12 +17,13 @@ import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivitySongOfMyArtistBinding;
 import com.example.jingmb3.model.offline.FavoriteDatabase;
 import com.example.jingmb3.model.offline.FavoriteObject;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyArtistDatabase;
 import com.example.jingmb3.model.offline.MyArtistObject;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.offline.fragment.SongOfArtistAdapter;
+import com.example.jingmb3.view.activity.adapter.SongOfArtistAdapter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,8 +36,10 @@ public class SongOfMyArtist extends AppCompatActivity {
     private MyArtistObject myArtistObject;
     private SongOfArtistAdapter songOfArtistAdapter;
     private ArrayList<MySongObject> ListSongOfArtist;
+    private ArrayList<MyArtistObject> listArtist;
     ActivitySongOfMyArtistBinding binding;
     private int REQUEST_GALLERY=100;
+    private ArrayList<MySongObject> FavList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +50,12 @@ public class SongOfMyArtist extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
         int IdArtist=getIntent().getIntExtra("Id",0);
         myArtistObject=new MyArtistObject();
+        FavList=new ArrayList<>();
         myArtistObject= MyArtistDatabase.getInstance(this).myArtistDAO().getArtistById(IdArtist);
         binding.NameArtist.setText(myArtistObject.getNameArtist());
         binding.NameArtist.setSelected(true);
@@ -76,6 +80,39 @@ public class SongOfMyArtist extends AppCompatActivity {
                             .getMyFavSongByID(ID);
                     FavoriteDatabase.getInstance(SongOfMyArtist.this).favoriteDAO().deleteSong(favoriteObject);
                     Toast.makeText(SongOfMyArtist.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                        MySongObject mySongObject=MySongsDatabase.getInstance(SongOfMyArtist.this).mySongsDAO()
+                                .getMySongByID(ID);
+                        if(MyMediaPlayer.getInstance().getIdSong()==mySongObject.getId_song()){
+                            MyMediaPlayer.getInstance().stopAudioFile();
+                            FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==mySongObject.getId_song()){
+                                    FavList.remove( FavList.get(i));
+                                    break;
+                                }
+                            }
+                            if(FavList.size()==0) MyMediaPlayer.getInstance().setCheckFavSong(false);
+                            MyMediaPlayer.getInstance().setPosition(0);
+                            MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                        }
+                        else{
+                            FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==mySongObject.getId_song()){
+                                    FavList.remove( FavList.get(i));
+                                    break;
+                                }
+                            }
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                    MyMediaPlayer.getInstance().setPosition(i);
+                                    break;
+                                }
+                            }
+                            MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                        }
+                    }
                 }
                 else{
                     MySongObject mySongObject=MySongsDatabase.getInstance(SongOfMyArtist.this).mySongsDAO()
@@ -84,6 +121,18 @@ public class SongOfMyArtist extends AppCompatActivity {
                             mySongObject.getImageSong(),mySongObject.getLinkSong(),mySongObject.getId_song());
                     FavoriteDatabase.getInstance(SongOfMyArtist.this).favoriteDAO().insertSong(favoriteObject);
                     Toast.makeText(SongOfMyArtist.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                        FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                        FavList.add(mySongObject);
+                        Arrange(FavList);
+                        for(int i=0;i<FavList.size();i++){
+                            if(FavList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                MyMediaPlayer.getInstance().setPosition(i);
+                                break;
+                            }
+                        }
+                        MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                    }
                 }
             }
         });
@@ -130,11 +179,11 @@ public class SongOfMyArtist extends AppCompatActivity {
     public void LoadUI(){
         ListSongOfArtist= (ArrayList<MySongObject>) MySongsDatabase.getInstance(this).
                 mySongsDAO().getListSongByArtist(myArtistObject.getNameArtist());
-        Arrange();
+        Arrange(ListSongOfArtist);
         binding.countSong.setText(ListSongOfArtist.size()+" Bài hát");
         songOfArtistAdapter.setData(ListSongOfArtist);
     }
-    public void Arrange(){
+    public void Arrange(ArrayList<MySongObject> ListSongOfArtist){
         Collections.sort(ListSongOfArtist, new Comparator<MySongObject>() {
             @Override
             public int compare(MySongObject mySongObject, MySongObject t1) {
@@ -167,12 +216,27 @@ public class SongOfMyArtist extends AppCompatActivity {
         }
         myArtistObject.setImageArtist(ImageView_to_Byte());
         MyArtistDatabase.getInstance(this).myArtistDAO().editArtist(myArtistObject);
+        if(ListSearch.getInstance().isCheckSearch()){
+            ListSearch.getInstance().setCheckUpdateListArtist(true);
+            listArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(this).myArtistDAO().getMyArtist();
+            ArrangeArtist();
+            ListSearch.getInstance().setListArtist(listArtist);
+        }
+    }
+
+    private void ArrangeArtist() {
+        Collections.sort(listArtist, new Comparator<MyArtistObject>() {
+            @Override
+            public int compare(MyArtistObject myArtistObject, MyArtistObject t1) {
+                return myArtistObject.getNameArtist().compareToIgnoreCase(t1.getNameArtist());
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 
     @Override

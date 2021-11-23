@@ -1,42 +1,27 @@
 package com.example.jingmb3.view.offline.fragment;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,29 +31,20 @@ import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentMySongsBinding;
 import com.example.jingmb3.model.offline.FavoriteDatabase;
 import com.example.jingmb3.model.offline.FavoriteObject;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
 import com.example.jingmb3.model.offline.MyArtistDatabase;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.activity.MainActivity;
 import com.example.jingmb3.view.offline.activity.AddMySong;
 import com.example.jingmb3.view.offline.activity.EditMySong;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
 import com.example.jingmb3.view.offline.activity.SelectAlbumToAddSong;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
+import com.example.jingmb3.view.activity.adapter.MySongAdapter;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -80,6 +56,9 @@ public class MySongs extends Fragment  {
     private static final int REQUEST_ADD_SONG = 80;
     FragmentMySongsBinding binding;
     private ArrayList<MySongObject> myListSong;
+    private ArrayList<MySongObject> FavList;
+    private ArrayList<MySongObject> artistList;
+    private ArrayList<MySongObject> albumList;
     private MySongAdapter mySongAdapter;
     private int reqestAddSongtoAlbum=100;
     private int reqestEditSong=99;
@@ -99,10 +78,11 @@ public class MySongs extends Fragment  {
             public void onClick(View view) {
                 Intent intent=new Intent(getActivity(), AddMySong.class);
                 startActivityForResult(intent,REQUEST_ADD_SONG);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
             }
         });
         myListSong=new ArrayList<MySongObject>();
+        FavList=new ArrayList<>();
         mySongAdapter=new MySongAdapter(getContext());
         mySongAdapter.IClickItemListener(new IClickItemListener() {
             @Override
@@ -138,10 +118,6 @@ public class MySongs extends Fragment  {
         super.onActivityResult(requestCode, resultCode, data);
         if(REQUEST_ADD_SONG==requestCode && resultCode==Activity.RESULT_OK){
             loadData();
-            MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
-            myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
-            if(!MyMediaPlayer.getInstance().isCheckFavSong() && !MyMediaPlayer.getInstance().isCheckSongAlbum() &&
-            !MyMediaPlayer.getInstance().isCheckSongArtist()) MyMediaPlayer.getInstance().setListPlaySong(myListSong);
             Toast.makeText(getContext(),"Đã thêm bài hát mới!",Toast.LENGTH_SHORT).show();
         }
         if(reqestAddSongtoAlbum==requestCode && resultCode==Activity.RESULT_OK){
@@ -167,6 +143,7 @@ public class MySongs extends Fragment  {
     public void loadData(){
         myListSong= (ArrayList<MySongObject>) MySongsDatabase.getInstance(getContext()).mySongsDAO().getListSong();
         Arrange(myListSong);
+        ListSearch.getInstance().setListSong(myListSong);
         binding.countSongs.setText(myListSong.size()+" Bài hát");
         mySongAdapter.setData(myListSong);
     }
@@ -244,6 +221,20 @@ public class MySongs extends Fragment  {
                     favoriteObject=new FavoriteObject(nameSong,nameArtist,imgSong,uriSong,IdSong);
                     FavoriteDatabase.getInstance(getContext()).favoriteDAO().insertSong(favoriteObject);
                     Toast.makeText(getContext(),"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                        MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                        FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                        FavList.add(myListSong.get(position));
+                        Arrange(FavList);
+                        for(int i=0;i<FavList.size();i++){
+                            if(FavList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                MyMediaPlayer.getInstance().setPosition(i);
+                                break;
+                            }
+                        }
+                        MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                        myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                    }
                     dialog.dismiss();
                 }
                 else{
@@ -251,6 +242,41 @@ public class MySongs extends Fragment  {
                             (myListSong.get(position).getId_song());
                     FavoriteDatabase.getInstance(getContext()).favoriteDAO().deleteSong(favoriteObject);
                     Toast.makeText(getContext(),"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                        if(MyMediaPlayer.getInstance().getIdSong()==myListSong.get(position).getId_song()){
+                            MyMediaPlayer.getInstance().stopAudioFile();
+                            MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                            FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==myListSong.get(position).getId_song()){
+                                    FavList.remove( FavList.get(i));
+                                    break;
+                                }
+                            }
+                            if(FavList.size()==0) MyMediaPlayer.getInstance().setCheckFavSong(false);
+                            MyMediaPlayer.getInstance().setPosition(0);
+                            MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                            myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                        }
+                        else{
+                            MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                            FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==myListSong.get(position).getId_song()){
+                                    FavList.remove( FavList.get(i));
+                                    break;
+                                }
+                            }
+                            for(int i=0;i<FavList.size();i++){
+                                if(FavList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                    MyMediaPlayer.getInstance().setPosition(i);
+                                    break;
+                                }
+                            }
+                            MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                            myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                        }
+                    }
                     dialog.dismiss();
                 }
             }
@@ -261,7 +287,7 @@ public class MySongs extends Fragment  {
                 Intent intent=new Intent(getActivity(), SelectAlbumToAddSong.class);
                 intent.putExtra("idSong",myListSong.get(position).getId_song());
                 startActivityForResult(intent,reqestAddSongtoAlbum);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 dialog.dismiss();
             }
         });
@@ -271,7 +297,7 @@ public class MySongs extends Fragment  {
                 Intent intent=new Intent(getActivity(), EditMySong.class);
                 intent.putExtra("idSong",myListSong.get(position).getId_song());
                 startActivityForResult(intent,reqestEditSong);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 dialog.dismiss();
             }
         });
@@ -296,6 +322,8 @@ public class MySongs extends Fragment  {
 
                         int IdSong=myListSong.get(postion).getId_song();
                         String nameArtist=myListSong.get(postion).getNameArtist();
+                        MyAlbumObject myAlbum=MyAlbumDatabase.getInstance(getContext()).myAlbumDAO().getAlbumById(MyMediaPlayer.getInstance().getIdAlbum());
+                        ArrayList<Integer> ListIdFavSong= (ArrayList<Integer>) FavoriteDatabase.getInstance(getContext()).favoriteDAO().getListIdSong();
                         ArrayList<MyAlbumObject> myAlbumList=new ArrayList<>();
                         myAlbumList= (ArrayList<MyAlbumObject>) MyAlbumDatabase.getInstance(getContext()).myAlbumDAO().getMyAlbum();
                         for(MyAlbumObject myAlbumObject:myAlbumList){
@@ -323,8 +351,6 @@ public class MySongs extends Fragment  {
                                     getInstance(getContext()).myArtistDAO().getArtistByName(nameArtist));
                         }
 
-                        List<MySongObject> listSong=new ArrayList<>();
-                        listSong=MyMediaPlayer.getInstance().getListPlaySong();
                         loadData();
                         if(myListSong.isEmpty()){
                             MyMediaPlayer.getInstance().stopAudioFile();
@@ -332,14 +358,96 @@ public class MySongs extends Fragment  {
                             myMusic.HideMiniPlayer();
                             return;
                         }
-                        if(!listSong.isEmpty()) {
-                            if(listSong.get(MyMediaPlayer.getInstance().getPosition()).getId_song()==IdSong){
-                                MyMediaPlayer.getInstance().stopAudioFile();
-                                MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                        if(MyMediaPlayer.getInstance().getIdSong()==IdSong){
+                            MyMediaPlayer.getInstance().stopAudioFile();
+                            MyMediaPlayer.getInstance().setCheckSongAlbum(false);
+                            MyMediaPlayer.getInstance().setCheckSongArtist(false);
+                            MyMediaPlayer.getInstance().setCheckFavSong(false);
+                            MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                            MyMediaPlayer.getInstance().setListPlaySong(myListSong);
+                            myMusic.loadMiniPlayer(0);
+                        }
+                        else {
+                            if(!MyMediaPlayer.getInstance().isCheckSongAlbum()&&!MyMediaPlayer.getInstance().isCheckSongArtist()
+                            &&!MyMediaPlayer.getInstance().isCheckFavSong()){
                                 MyMediaPlayer.getInstance().setListPlaySong(myListSong);
-                                myMusic.loadMiniPlayer(0);
+                                for(int j=0;j<myListSong.size();j++){
+                                    if(myListSong.get(j).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                        MyMediaPlayer.getInstance().setPosition(j);
+                                        break;
+                                    }
+                                }
+                                MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                                myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
                             }
-                            else MyMediaPlayer.getInstance().setListPlaySong(myListSong);
+                            else if(MyMediaPlayer.getInstance().isCheckSongArtist()){
+                                if(MyArtistDatabase.getInstance(getContext()).myArtistDAO().getArtistById(MyMediaPlayer
+                                .getInstance().getIdArtist()).getNameArtist().equals(nameArtist)){
+                                    artistList=MyMediaPlayer.getInstance().getListPlaySong();
+                                    Arrange(artistList);
+                                    for(MySongObject mySongObject:artistList){
+                                        if(mySongObject.getId_song()==IdSong){
+                                            artistList.remove(mySongObject);
+                                            break;
+                                        }
+                                    }
+                                    for(int k=0;k<artistList.size();k++){
+                                        if(artistList.get(k).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                            MyMediaPlayer.getInstance().setPosition(k);
+                                            break;
+                                        }
+                                    }
+                                    MyMediaPlayer.getInstance().setListPlaySong(artistList);
+                                    MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                                    myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                                }
+                            }
+                            else if(MyMediaPlayer.getInstance().isCheckSongAlbum()){
+                                if(myAlbum.getId_song()!=null){
+                                    if(myAlbum.getId_song().contains(String.valueOf(IdSong))){
+                                        albumList=MyMediaPlayer.getInstance().getListPlaySong();
+                                        Arrange(albumList);
+                                        for(MySongObject mySongObject:albumList){
+                                            if(mySongObject.getId_song()==IdSong){
+                                                albumList.remove(mySongObject);
+                                                break;
+                                            }
+                                        }
+                                        for(int k=0;k<albumList.size();k++){
+                                            if(albumList.get(k).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                                MyMediaPlayer.getInstance().setPosition(k);
+                                                break;
+                                            }
+                                        }
+                                        MyMediaPlayer.getInstance().setListPlaySong(albumList);
+                                        MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                                        myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                                    }
+                                }
+                            }
+                            else if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                                if(ListIdFavSong!=null){
+                                    if(ListIdFavSong.contains(IdSong)){
+                                        FavList=MyMediaPlayer.getInstance().getListPlaySong();
+                                        Arrange(FavList);
+                                        for(MySongObject mySongObject:FavList){
+                                            if(mySongObject.getId_song()==IdSong){
+                                                FavList.remove(mySongObject);
+                                                break;
+                                            }
+                                        }
+                                        for(int k=0;k<FavList.size();k++){
+                                            if(FavList.get(k).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                                MyMediaPlayer.getInstance().setPosition(k);
+                                                break;
+                                            }
+                                        }
+                                        MyMediaPlayer.getInstance().setListPlaySong(FavList);
+                                        MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                                        myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                                    }
+                                }
+                            }
                         }
                     }
                 })

@@ -13,17 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.jingmb3.R;
-import com.example.jingmb3.databinding.FragmentSearchMyAlbumBinding;
 import com.example.jingmb3.databinding.FragmentSearchMyArtistBinding;
-import com.example.jingmb3.model.offline.MyAlbumDatabase;
-import com.example.jingmb3.model.offline.MyAlbumObject;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyArtistDatabase;
 import com.example.jingmb3.model.offline.MyArtistObject;
 import com.example.jingmb3.view.offline.activity.Search;
 import com.example.jingmb3.view.offline.activity.SongOfMyArtist;
-import com.example.jingmb3.view.offline.activity.SongsOfAlbum;
-import com.example.jingmb3.view.offline.adapter.SearchMyAlbumAdapter;
-import com.example.jingmb3.view.offline.adapter.SearchMyArtistAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMyArtistAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +57,7 @@ public class SearchMyArtist extends Fragment {
                 Intent intent=new Intent(getActivity(), SongOfMyArtist.class);
                 intent.putExtra("Id",SearchMyArtistAdapter.getInstance().getListArtists().get(position).getId_artist());
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
             }
         });
     }
@@ -71,17 +67,25 @@ public class SearchMyArtist extends Fragment {
     }
 
     public void loadData(){
-        listArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(getContext()).myArtistDAO().getMyArtist();
-        Arrange();
+        listArtist= ListSearch.getInstance().getListArtist();
         SearchMyArtistAdapter.getInstance().setData(listArtist,getContext());
     }
 
-    public void Arrange(){
-        Collections.sort(listArtist, new Comparator<MyArtistObject>() {
-            @Override
-            public int compare(MyArtistObject myArtistObject, MyArtistObject t1) {
-                return myArtistObject.getNameArtist().compareToIgnoreCase(t1.getNameArtist());
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(ListSearch.getInstance().isCheckUpdateListArtist()){
+            ListSearch.getInstance().setCheckUpdateListArtist(false);
+            loadData();
+            ArrayList<MyArtistObject> arrayList=new ArrayList<>();
+            for(MyArtistObject myArtistObject:listArtist){
+                if(myArtistObject.getNameArtist().toLowerCase().contains(Search.getBinding().search
+                        .getQuery().toString().trim().toLowerCase()))
+                    arrayList.add(myArtistObject);
             }
-        });
+            SearchMyArtistAdapter.getInstance().setListArtists(arrayList);
+            SearchMyArtistAdapter.getInstance().notifyDataSetChanged();
+        }
     }
 }

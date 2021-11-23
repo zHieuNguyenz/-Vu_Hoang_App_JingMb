@@ -1,10 +1,9 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,17 +15,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
-import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
+import com.example.jingmb3.view.offline.fragment.IClickItemListener;
 
 
 import java.util.ArrayList;
-import java.util.Random;
 
 
 public class MySongAdapter extends RecyclerView.Adapter<MySongAdapter.ViewHolder>{
     private ArrayList<MySongObject> ListSongs;
-    private  IClickItemListener iClickItemListener;
+    private IClickItemListener iClickItemListener;
     private Context mContext;
     public interface ClickMoreOption{
         void clickMoreOption(int position);

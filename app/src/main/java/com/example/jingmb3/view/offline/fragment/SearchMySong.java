@@ -11,18 +11,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentSearchMySongBinding;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
 import com.example.jingmb3.view.offline.activity.Search;
-import com.example.jingmb3.view.offline.adapter.SearchMySongAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMySongAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,18 +94,25 @@ public class SearchMySong extends Fragment {
     }
 
     public void loadData(){
-        listSong= (ArrayList<MySongObject>) MySongsDatabase.getInstance(getContext()).mySongsDAO().getListSong();
-        Arrange(listSong);
+        listSong= ListSearch.getInstance().getListSong();
         SearchMySongAdapter.getInstance().setData(listSong);
     }
 
-    public void Arrange(ArrayList<MySongObject> myListSong){
-        Collections.sort(myListSong, new Comparator<MySongObject>() {
-            @Override
-            public int compare(MySongObject mySongObject, MySongObject t1) {
-                return mySongObject.getNameSong().compareToIgnoreCase(t1.getNameSong());
-            }
-        });
-    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(ListSearch.getInstance().isCheckUpdateListSong()){
+            ListSearch.getInstance().setCheckUpdateListSong(false);
+            loadData();
+            ArrayList<MySongObject> arrayList=new ArrayList<>();
+            for(MySongObject mySongObject:listSong){
+                if(mySongObject.getNameSong().toLowerCase().contains(Search.getBinding().search
+                        .getQuery().toString().trim().toLowerCase()))
+                    arrayList.add(mySongObject);
+            }
+            SearchMySongAdapter.getInstance().setListSong(arrayList);
+            SearchMySongAdapter.getInstance().notifyDataSetChanged();
+        }
+    }
 }

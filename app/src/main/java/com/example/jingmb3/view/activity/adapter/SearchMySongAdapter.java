@@ -1,11 +1,8 @@
-package com.example.jingmb3.view.offline.adapter;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
-import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
-import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.offline.activity.PlayerSong;
 
 import java.util.ArrayList;
 
@@ -42,6 +35,9 @@ public class SearchMySongAdapter extends RecyclerView.Adapter<SearchMySongAdapte
         void clickItem(int postion);
     }
 
+    public void setListSong(ArrayList<MySongObject> listSong) {
+        this.listSong = listSong;
+    }
 
     public void setData(ArrayList<MySongObject> listSong){
         listSongSearch= listSong;

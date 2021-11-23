@@ -1,14 +1,22 @@
 package com.example.jingmb3.view.offline.activity;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.ColorUtils;
+import androidx.palette.graphics.Palette;
 
+import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
@@ -60,7 +68,6 @@ public class PlayerSong extends AppCompatActivity {
 
     private  Bitmap bitmap=null;
     private ActivityPlayerSongBinding binding;
-
     private ArrayList<MySongObject> myListSong;
     private int position;
     boolean fav=false;
@@ -70,6 +77,8 @@ public class PlayerSong extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityPlayerSongBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        //Sự kiện khi nhấn nút đóng màn hình chơi nhạc
         binding.closePlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,8 +87,10 @@ public class PlayerSong extends AppCompatActivity {
             }
         });
 
+        //Kiểm tra chế độ lặp lại đang bật hay tắt để set background cho nút tương ứng
         if(MyMediaPlayer.getInstance().isCheckRepeat())
             binding.repeatBtn.setImageResource(R.drawable.ic_current_repeat);
+        //Sự kiện nhấn nút lặp lại
         binding.repeatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -95,13 +106,15 @@ public class PlayerSong extends AppCompatActivity {
             }
         });
 
+        //Kiểm tra chế độ ngẫu nhiên đang bật hay tắt để set background cho nút tương ứng
         if(MyMediaPlayer.getInstance().isCheckRandom())
-            binding.randomBtn.setImageResource(R.drawable.ic_random);
+            binding.randomBtn.setImageResource(R.drawable.ic_shuffle_on);
+        //Sự kiện nhấn nút ngẫu nhiên
         binding.randomBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(!MyMediaPlayer.getInstance().isCheckRandom()){
-                    binding.randomBtn.setImageResource(R.drawable.ic_random);
+                    binding.randomBtn.setImageResource(R.drawable.ic_shuffle_on);
                     MyMediaPlayer.getInstance().setCheckRandom(true);
                     Toast.makeText(PlayerSong.this,"Phát ngẫu nhiên BẬT",Toast.LENGTH_SHORT).show();
                 }else {
@@ -112,6 +125,9 @@ public class PlayerSong extends AppCompatActivity {
             }
         });
 
+
+        //KIỂM TRA DANH SÁCH CHƠI NHẠC
+        //Kiểm tra danh sách nhạc đang phát trong một album
         if(MyMediaPlayer.getInstance().isCheckSongAlbum()){
             int IdAlbum=MyMediaPlayer.getInstance().getIdAlbum();
             MyAlbumObject myAlbumObject=MyAlbumDatabase.getInstance(this).myAlbumDAO().getAlbumById(IdAlbum);
@@ -125,6 +141,7 @@ public class PlayerSong extends AppCompatActivity {
             Arrange(myListSong);
             MyMediaPlayer.getInstance().setListPlaySong(myListSong);
         }
+        //Kiểm tra danh sách nhạc đang phát trong một nghệ sĩ
         else if(MyMediaPlayer.getInstance().isCheckSongArtist()){
             int IdArtist=MyMediaPlayer.getInstance().getIdArtist();
             MyArtistObject myArtistObject= MyArtistDatabase.getInstance(this).myArtistDAO().getArtistById(IdArtist);
@@ -134,6 +151,7 @@ public class PlayerSong extends AppCompatActivity {
             Arrange(myListSong);
             MyMediaPlayer.getInstance().setListPlaySong(myListSong);
         }
+        //Kiểm tra danh sách nhạc đang phát trong danh sách các bài hát yêu thích
         else if(MyMediaPlayer.getInstance().isCheckFavSong()){
             myListSong=new ArrayList<>();
             List<Integer> IdSong=FavoriteDatabase.getInstance(this).favoriteDAO().getListIdSong();
@@ -143,6 +161,7 @@ public class PlayerSong extends AppCompatActivity {
             Arrange(myListSong);
             MyMediaPlayer.getInstance().setListPlaySong(myListSong);
         }
+        //Danh sách chơi nhạc là danh sách tất cả các bài hát
         else{
             myListSong= (ArrayList<MySongObject>) MySongsDatabase.getInstance(this).mySongsDAO().getListSong();
             Arrange(myListSong);
@@ -150,7 +169,7 @@ public class PlayerSong extends AppCompatActivity {
         }
 
 
-
+        //Lấy vị trí của một bài hát trong danh sách phát và hiển thị lên màn hình tương ứng
         position=getIntent().getIntExtra("pos",0);
         binding.songName.setSelected(true);
         binding.songName.setText(myListSong.get(position).getNameSong());
@@ -158,46 +177,45 @@ public class PlayerSong extends AppCompatActivity {
         bitmap = BitmapFactory.decodeByteArray(myListSong.get(position).getImageSong(),
                     0,myListSong.get(position).getImageSong().length);
         binding.imageSong.setImageBitmap(bitmap);
+
+        //Đặt màu nền màn hình chơi nhạc theo màu chủ đạo trong ảnh của bài hát
+        ScreenBackground();
+
+        //Kiểm tra xem bài hát đang phát có được yêu htisch hay không
         favoriteSong();
-        binding.favBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(fav){
-                    FavoriteObject favoriteObject=FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().getMyFavSongByID
-                            (myListSong.get(position).getId_song());
-                    FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().deleteSong(favoriteObject);
-                    binding.favBtn.setImageResource(R.drawable.ic_favorite_border);
-                    fav=false;
-                    Toast.makeText(PlayerSong.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    String nameSong=myListSong.get(position).getNameSong();
-                    String nameArtist=myListSong.get(position).getNameArtist();
-                    byte[] imgSong=myListSong.get(position).getImageSong();
-                    String uriSong=myListSong.get(position).getLinkSong();
-                    int IdSong=myListSong.get(position).getId_song();
-                    FavoriteObject favoriteObject;
-                    favoriteObject=new FavoriteObject(nameSong,nameArtist,imgSong,uriSong,IdSong);
-                    FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().insertSong(favoriteObject);
-                    binding.favBtn.setImageResource(R.drawable.ic_favorite);
-                    fav=true;
-                    Toast.makeText(PlayerSong.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+
+
+        //Kiểm tra logic khi đi vào màn hình chơi nhạc để phát bài hát hoặc không
         if(MyMediaPlayer.getInstance().getMediaPlayer()==null){
+            if(MyMusic.isPressMiniPlay()){
+                binding.playBtn.setImageResource(R.drawable.icon_play);
+                MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMusic.setPressMiniPlay(false);
+            }
+            else{
+                MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMediaPlayer.getInstance().Start();
                 imageAnimation();
                 binding.playBtn.setImageResource(R.drawable.icon_pause);
-                MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+            }
         }
         else if(MyMediaPlayer.getInstance().isCheckStopMedia()){
-            MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
-            MyMediaPlayer.getInstance().setStopMedia();
-            imageAnimation();
-            binding.playBtn.setImageResource(R.drawable.icon_pause);
+            if(MyMusic.isPressMiniPlay()){
+                binding.playBtn.setImageResource(R.drawable.icon_play);
+                MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMusic.setPressMiniPlay(false);
+            }
+            else{
+                MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+                MyMediaPlayer.getInstance().Start();
+                MyMediaPlayer.getInstance().setStopMedia();
+                imageAnimation();
+                binding.playBtn.setImageResource(R.drawable.icon_pause);
+            }
         }
         else
         {
+            if(MyMusic.isPressMiniPlay()) MyMusic.setPressMiniPlay(false);
             if(MyMediaPlayer.getInstance().chechMedia()){
                 binding.playBtn.setImageResource(R.drawable.icon_pause);
                 imageAnimation();
@@ -208,6 +226,7 @@ public class PlayerSong extends AppCompatActivity {
         }
 
 
+        //sự kiện nhấn nút chơi nhạc hoặc dừng
         binding.playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -220,16 +239,21 @@ public class PlayerSong extends AppCompatActivity {
                 else{
                     binding.playBtn.setImageResource(R.drawable.icon_pause);
                     MyMediaPlayer.getInstance().getMediaPlayer().start();
+                    MyMediaPlayer.getInstance().setStopMedia();
                     binding.songName.setSelected(true);
                     imageAnimation();
                 }
             }
         });
+
+        //Xử lí chuyển phát bài hát tiếp theo khi bài hát hiện tại hoàn thành
         mediaComplete();
 
+        //Sự kiện nhấn nút chuyển sang bài hát tiếp theo
         binding.nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Kiểm tra chế độ ngẫu nhiên hay lặp lại có đang bật hay không
                 if(MyMediaPlayer.getInstance().isCheckRepeat()){
                     repeatSong();
                     return;
@@ -238,12 +262,16 @@ public class PlayerSong extends AppCompatActivity {
                     RandomPlay();
                     return;
                 }
+                //Nếu hai chế độ trên không bật thì thực hiện chuyển phát bài hát tiếp theo
                 nextSong();
             }
         });
+
+        //Sự kiện nhấn nút chuyển sang bài hát ở trước
         binding.prevBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Kiểm tra chế độ ngẫu nhiên hay lặp lại có đang bật hay không
                 if(MyMediaPlayer.getInstance().isCheckRepeat()){
                     repeatSong();
                     return;
@@ -252,11 +280,12 @@ public class PlayerSong extends AppCompatActivity {
                     RandomPlay();
                     return;
                 }
+                //Nếu hai chế độ trên không bật thì thực hiện chuyển phát bài hát trước đó
                previousSong();
             }
         });
 
-
+        ///Cập nhật tiến trình của Seekbar
         updateSeekbar=new Thread(){
             @Override
             public void run() {
@@ -276,12 +305,60 @@ public class PlayerSong extends AppCompatActivity {
         };
         Seekbar();
 
-        binding.timeEnd.setText(createTime(MyMediaPlayer.getInstance().getMediaPlayer().getCurrentPosition()));
+        //Set thời gian kết thúc bài hát
         binding.timeEnd.setText(createTime(MyMediaPlayer.getInstance().getMediaPlayer().getDuration()));
     }
 
+    //Hàm set màu nền màn hình dựa theo màu chủ đạo trong ảnh của bài hát tương thích
+    private void ScreenBackground() {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            @Override
+            public void onGenerated(@Nullable Palette palette) {
+                int color=palette.getDominantColor(1);
+                binding.screenPlay.setBackgroundColor(color);
+                binding.screenPlay.getBackground().setAlpha(230);
+                if(isColorDark(((ColorDrawable) binding.screenPlay.getBackground()).getColor())) {
+                    binding.playBtn.setColorFilter(Color.WHITE);
+                    binding.nextBtn.setColorFilter(Color.WHITE);
+                    binding.prevBtn.setColorFilter(Color.WHITE);
+                    binding.randomBtn.setColorFilter(Color.WHITE);
+                    binding.repeatBtn.setColorFilter(Color.WHITE);
+                    binding.timeStart.setTextColor(Color.WHITE);
+                    binding.timeEnd.setTextColor(Color.WHITE);
+                    binding.songName.setTextColor(Color.WHITE);
+                    binding.artistName.setTextColor(Color.WHITE);
+                    binding.textPlay.setTextColor(Color.WHITE);
+                    binding.favBtn.setColorFilter(Color.WHITE);
+                    binding.closePlayer.setColorFilter(Color.WHITE);
+                    binding.seekBar.getThumb().setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.SRC_IN);
+                    binding.seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.MULTIPLY);
+                }else {
+                    binding.playBtn.setColorFilter(Color.BLACK);
+                    binding.nextBtn.setColorFilter(Color.BLACK);
+                    binding.prevBtn.setColorFilter(Color.BLACK);
+                    binding.randomBtn.setColorFilter(Color.BLACK);
+                    binding.repeatBtn.setColorFilter(Color.BLACK);
+                    binding.timeStart.setTextColor(Color.BLACK);
+                    binding.timeEnd.setTextColor(Color.BLACK);
+                    binding.songName.setTextColor(Color.BLACK);
+                    binding.artistName.setTextColor(Color.BLACK);
+                    binding.textPlay.setTextColor(Color.BLACK);
+                    binding.favBtn.setColorFilter(Color.BLACK);
+                    binding.closePlayer.setColorFilter(Color.BLACK);
+                    binding.seekBar.getThumb().setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.SRC_IN);
+                    binding.seekBar.getThumb().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.MULTIPLY);
+                    binding.seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.black), PorterDuff.Mode.MULTIPLY);
+                }
+            }
+        });
+    }
 
+    //Kiểm tra phân biệt màu sáng hay tối
+    public boolean isColorDark(int color){
+        return ColorUtils.calculateLuminance(color) < 0.35;
+    }
 
+    //Hàm kiểm tra bài hát đang phát được yêu thích hay không và xử lí sự kiện khi nhấn vào nsut yêu thích
     private void favoriteSong(){
         ArrayList<Integer> IdFavSong= (ArrayList<Integer>) FavoriteDatabase.getInstance(this).favoriteDAO().getListIdSong();
         if (!IdFavSong.isEmpty()){
@@ -294,8 +371,51 @@ public class PlayerSong extends AppCompatActivity {
                 fav=false;
             }
         }
+        binding.favBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(fav){
+                    FavoriteObject favoriteObject=FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().getMyFavSongByID
+                            (myListSong.get(position).getId_song());
+                    FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().deleteSong(favoriteObject);
+                    binding.favBtn.setImageResource(R.drawable.ic_favorite_border);
+                    fav=false;
+                    Toast.makeText(PlayerSong.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    if(MyMediaPlayer.getInstance().isCheckFavSong()){
+                        if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
+                        for(MySongObject mySongObject:myListSong){
+                            if(mySongObject.getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                                myListSong.remove(mySongObject);
+                                break;
+                            }
+                        }
+                        MyMediaPlayer.getInstance().setListPlaySong(myListSong);
+                        MyMediaPlayer.getInstance().setPosition(0);
+                        if(myListSong.size()==0) {
+                            MyMediaPlayer.getInstance().setCheckFavSong(false);
+                        }
+                        finish();
+                        overridePendingTransition(0, R.anim.slide_down_out);
+                    }
+                }
+                else {
+                    String nameSong=myListSong.get(position).getNameSong();
+                    String nameArtist=myListSong.get(position).getNameArtist();
+                    byte[] imgSong=myListSong.get(position).getImageSong();
+                    String uriSong=myListSong.get(position).getLinkSong();
+                    int IdSong=myListSong.get(position).getId_song();
+                    FavoriteObject favoriteObject;
+                    favoriteObject=new FavoriteObject(nameSong,nameArtist,imgSong,uriSong,IdSong);
+                    FavoriteDatabase.getInstance(PlayerSong.this).favoriteDAO().insertSong(favoriteObject);
+                    binding.favBtn.setImageResource(R.drawable.ic_favorite);
+                    fav=true;
+                    Toast.makeText(PlayerSong.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
+    //Hiệu ứng ảnh chuyển động quay tròn
     public void imageAnimation(){
         RotateAnimation rotateAnimation = new RotateAnimation(0, 360f,
                 Animation.RELATIVE_TO_SELF, 0.5f,
@@ -308,6 +428,8 @@ public class PlayerSong extends AppCompatActivity {
         binding.imageSong.startAnimation(rotateAnimation);
 
     }
+
+    //Hàm tính toán thời gian bắt đầu và kết thúc của bài hát
     public String createTime(int duration){
         String time="";
         int min=duration/1000/60;
@@ -320,15 +442,16 @@ public class PlayerSong extends AppCompatActivity {
         return time;
     }
 
-
+    //Hàm thiết lập và quản lí thanh Seekbar khi nhạc đang chơi
     private void Seekbar(){
+        //set độ rộng thanh seekbar theo tổng thời gian của bài hát
         binding.seekBar.setMax(MyMediaPlayer.getInstance().getMediaPlayer().getDuration());
-        binding.seekBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.white), PorterDuff.Mode.MULTIPLY);
-        binding.seekBar.getThumb().setColorFilter(getResources().getColor(R.color.gray), PorterDuff.Mode.SRC_IN);
         updateSeekbar.start();
+        //Bắt sự kiện khi nhấn vào thanh Seekbar thay đổi
         binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                //Set thời gian bắt đầu bài hát sẽ được cập nhật liên tục dựa theo tiến trình thay đổi của thanh Seekbar
                 binding.timeStart.setText(createTime(MyMediaPlayer.getInstance().getMediaPlayer().getCurrentPosition()));
                 if(b){
                     MyMediaPlayer.getInstance().getMediaPlayer().seekTo(i);
@@ -348,13 +471,16 @@ public class PlayerSong extends AppCompatActivity {
         });
     }
 
+    //Hàm thực hiện chuyển phát bài hát tiếp theo
     private void nextSong(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
         binding.playBtn.setImageResource(R.drawable.icon_pause);
+        imageAnimation();
         binding.songName.setSelected(true);
         position=((position+1)%myListSong.size());
         MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
         favoriteSong();
         binding.seekBar.setMax(MyMediaPlayer.getInstance().getMediaPlayer().getDuration());
         mediaComplete();
@@ -364,13 +490,18 @@ public class PlayerSong extends AppCompatActivity {
         bitmap = BitmapFactory.decodeByteArray(myListSong.get(position).getImageSong(),
                 0,myListSong.get(position).getImageSong().length);
         binding.imageSong.setImageBitmap(bitmap);
+        ScreenBackground();
     }
+
+    //Hàm thực hiện chuyển phát bài hát trước đó
     private void previousSong(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
         binding.playBtn.setImageResource(R.drawable.icon_pause);
+        imageAnimation();
         position=((position-1)<0?(myListSong.size()-1):position-1);
         MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
         favoriteSong();
         binding.seekBar.setMax(MyMediaPlayer.getInstance().getMediaPlayer().getDuration());
         mediaComplete();
@@ -381,17 +512,25 @@ public class PlayerSong extends AppCompatActivity {
         bitmap = BitmapFactory.decodeByteArray(myListSong.get(position).getImageSong(),
                 0,myListSong.get(position).getImageSong().length);
         binding.imageSong.setImageBitmap(bitmap);
+        ScreenBackground();
     }
+
+    //Hàm thực hiện chuyển phát bài hát lặp lại
     private void repeatSong(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
         MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
+        binding.playBtn.setImageResource(R.drawable.icon_pause);
+        imageAnimation();
         favoriteSong();
         binding.seekBar.setMax(MyMediaPlayer.getInstance().getMediaPlayer().getDuration());
         mediaComplete();
         binding.timeEnd.setText(createTime(MyMediaPlayer.getInstance().getMediaPlayer().getDuration()));
         binding.songName.setSelected(true);
     }
+
+    //Hàm thực hiện chuyển phát bài hát ngẫu nhiên
     private void RandomPlay(){
         MyMediaPlayer.getInstance().stopAudioFile();
         MyMediaPlayer.getInstance().setStopMedia();
@@ -402,6 +541,9 @@ public class PlayerSong extends AppCompatActivity {
         }while(valueRandom==position);
         position=valueRandom;
         MyMediaPlayer.getInstance().playAudioFile(getApplicationContext(),myListSong.get(position).getLinkSong(),position);
+        MyMediaPlayer.getInstance().Start();
+        binding.playBtn.setImageResource(R.drawable.icon_pause);
+        imageAnimation();
         favoriteSong();
         binding.seekBar.setMax(MyMediaPlayer.getInstance().getMediaPlayer().getDuration());
         mediaComplete();
@@ -412,7 +554,10 @@ public class PlayerSong extends AppCompatActivity {
         bitmap = BitmapFactory.decodeByteArray(myListSong.get(position).getImageSong(),
                 0,myListSong.get(position).getImageSong().length);
         binding.imageSong.setImageBitmap(bitmap);
+        ScreenBackground();
     }
+
+    //Hàm xử lí chuyển phát bài hát tiếp theo khi bài hát hiện tại đã hoàn thành
     public void mediaComplete(){
         MyMediaPlayer.getInstance().getMediaPlayer().setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
@@ -431,6 +576,8 @@ public class PlayerSong extends AppCompatActivity {
             }
         });
     }
+
+    //Hàm sắp xếp danh sách phát nhạc theo thứ tự
     public void Arrange(ArrayList<MySongObject> myListSong){
         Collections.sort(myListSong, new Comparator<MySongObject>() {
             @Override

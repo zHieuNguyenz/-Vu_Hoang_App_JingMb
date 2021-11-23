@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
@@ -11,13 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
-import com.example.jingmb3.model.offline.MySongObject;
+import com.example.jingmb3.view.offline.fragment.ClickItemFileMP3;
 
 import java.util.ArrayList;
 
 public class FileMP3StoreAdapter extends RecyclerView.Adapter<FileMP3StoreAdapter.ViewHolder>{
     ArrayList<String> ListNameFile;
-    private  ClickItemFileMP3 clickItemFileMP3;
+    private ClickItemFileMP3 clickItemFileMP3;
 
     public FileMP3StoreAdapter(ArrayList<String> listNameFile,ClickItemFileMP3 clickItemFileMP3) {
         ListNameFile = listNameFile;

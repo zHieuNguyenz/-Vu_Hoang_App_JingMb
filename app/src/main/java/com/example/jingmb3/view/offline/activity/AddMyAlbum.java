@@ -57,7 +57,7 @@ public class AddMyAlbum extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
 
@@ -75,8 +75,7 @@ public class AddMyAlbum extends AppCompatActivity {
     }
     private void SaveAlbum() {
         String name=binding.inNameAlbum.getText().toString().trim();
-        String artist=binding.inArtistAlbum.getText().toString().trim();
-        if (name.isEmpty() || artist.isEmpty()){
+        if (name.isEmpty()){
             Toast.makeText(AddMyAlbum.this,"Hãy nhập đủ thông tin!",Toast.LENGTH_SHORT).show();
             return;
         }
@@ -84,11 +83,13 @@ public class AddMyAlbum extends AppCompatActivity {
             Toast.makeText(AddMyAlbum.this,"Đã tồn tại Album!",Toast.LENGTH_SHORT).show();
             return;
         }
-        MyAlbumObject myAlbumObject=new MyAlbumObject(name,ImageView_to_Byte(),artist);
+        MyAlbumObject myAlbumObject=new MyAlbumObject();
+        myAlbumObject.setNameAlbum(name);
+        myAlbumObject.setImageAlbum(ImageView_to_Byte());
         MyAlbumDatabase.getInstance(this).myAlbumDAO().insertAlbum(myAlbumObject);
         setResult(Activity.RESULT_OK);
         finish();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 
     private void Camera(){
@@ -134,6 +135,6 @@ public class AddMyAlbum extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 }

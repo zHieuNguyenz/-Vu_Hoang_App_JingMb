@@ -35,7 +35,6 @@ public class EditMyAlbum extends AppCompatActivity {
         int IdAlbum=getIntent().getIntExtra("IdAlbum",0);
         myAlbumObject= MyAlbumDatabase.getInstance(this).myAlbumDAO().getAlbumById(IdAlbum);
         binding.inNameAlbum.setText(myAlbumObject.getNameAlbum());
-        binding.inArtistAlbum.setText(myAlbumObject.getNameArstist());
         if(myAlbumObject.getImageAlbum()!=null){
             Bitmap bitmap= BitmapFactory.decodeByteArray(myAlbumObject.getImageAlbum(),0,
                     myAlbumObject.getImageAlbum().length);
@@ -46,7 +45,7 @@ public class EditMyAlbum extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
         binding.cameraAlbum.setOnClickListener(new View.OnClickListener() {
@@ -71,13 +70,11 @@ public class EditMyAlbum extends AppCompatActivity {
 
     private void SaveAlbum() {
         String nameAlbum=binding.inNameAlbum.getText().toString().trim();
-        String nameArtist=binding.inArtistAlbum.getText().toString().trim();
-        if(nameAlbum.isEmpty()||nameArtist.isEmpty()){
+        if(nameAlbum.isEmpty()){
             Toast.makeText(this,"Hãy điền đủ thông tin!",Toast.LENGTH_SHORT).show();
             return;
         }
         myAlbumObject.setNameAlbum(nameAlbum);
-        myAlbumObject.setNameArstist(nameArtist);
         myAlbumObject.setImageAlbum(ImageView_to_Byte());
         MyAlbumDatabase.getInstance(this).myAlbumDAO().editAlbum(myAlbumObject);
         setResult(Activity.RESULT_OK);
@@ -129,6 +126,6 @@ public class EditMyAlbum extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 }

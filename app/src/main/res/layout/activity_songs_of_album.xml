@@ -17,7 +17,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_keyboard_arrow_down" />
+        android:src="@drawable/ic_back" />
     <com.google.android.material.imageview.ShapeableImageView
         app:shapeAppearance="@style/CornerImg"
         android:id="@+id/ImgAlbum"

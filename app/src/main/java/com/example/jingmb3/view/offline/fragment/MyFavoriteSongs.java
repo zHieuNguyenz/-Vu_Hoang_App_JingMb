@@ -2,7 +2,6 @@ package com.example.jingmb3.view.offline.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,15 +31,14 @@ import com.example.jingmb3.model.offline.FavoriteDatabase;
 import com.example.jingmb3.model.offline.FavoriteObject;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
-import com.example.jingmb3.model.offline.MySongsDatabase;
 import com.example.jingmb3.view.offline.activity.EditMySong;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
 import com.example.jingmb3.view.offline.activity.SelectAlbumToAddSong;
+import com.example.jingmb3.view.activity.adapter.MyFavSongAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 
 public class MyFavoriteSongs extends Fragment {
@@ -124,7 +122,7 @@ public class MyFavoriteSongs extends Fragment {
                 Intent intent=new Intent(getActivity(), SelectAlbumToAddSong.class);
                 intent.putExtra("idSong",myFavListSong.get(position).getId_song());
                 startActivityForResult(intent,reqestAddSongtoAlbum);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 dialog.dismiss();
             }
         });
@@ -132,9 +130,45 @@ public class MyFavoriteSongs extends Fragment {
         RemoveFromFavList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int IdSong=myFavListSong.get(position).getId_song();
                 FavoriteDatabase.getInstance(getContext()).favoriteDAO().deleteSong(myFavListSong.get(position));
                 Toast.makeText(getContext(),"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
                 loadData();
+                if(IdSong==MyMediaPlayer.getInstance().getIdSong()){
+                    MyMediaPlayer.getInstance().stopAudioFile();
+                    MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                    ArrayList<MySongObject> arrayList=new ArrayList<>();
+                    arrayList=MyMediaPlayer.getInstance().getListPlaySong();
+                    for(MySongObject mySongObject:arrayList){
+                        if(mySongObject.getId_song()==IdSong){
+                            arrayList.remove(mySongObject);
+                            break;
+                        }
+                    }
+                    if(arrayList.size()==0) MyMediaPlayer.getInstance().setCheckFavSong(false);
+                    MyMediaPlayer.getInstance().setListPlaySong(arrayList);
+                    MyMediaPlayer.getInstance().setPosition(0);
+                    myMusic.loadMiniPlayer(0);
+                }
+                else{
+                    MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
+                    ArrayList<MySongObject> arrayList=new ArrayList<>();
+                    arrayList=MyMediaPlayer.getInstance().getListPlaySong();
+                    for(MySongObject mySongObject:arrayList){
+                        if(mySongObject.getId_song()==IdSong){
+                            arrayList.remove(mySongObject);
+                            break;
+                        }
+                    }
+                    for(int i=0;i<arrayList.size();i++){
+                        if(arrayList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                            MyMediaPlayer.getInstance().setPosition(i);
+                            break;
+                        }
+                    }
+                    MyMediaPlayer.getInstance().setListPlaySong(arrayList);
+                    myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
+                }
                 dialog.dismiss();
             }
         });
@@ -145,7 +179,7 @@ public class MyFavoriteSongs extends Fragment {
                 Intent intent=new Intent(getActivity(), EditMySong.class);
                 intent.putExtra("idSong",myFavListSong.get(position).getId_song());
                 startActivityForResult(intent,reqestEditSong);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 dialog.dismiss();
             }
         });

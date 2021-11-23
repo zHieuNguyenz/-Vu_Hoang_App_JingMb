@@ -11,11 +11,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.widget.Toast;
 
-import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivityMyMusicStoreBinding;
-import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.view.offline.fragment.ClickItemFileMP3;
-import com.example.jingmb3.view.offline.fragment.FileMP3StoreAdapter;
+import com.example.jingmb3.view.activity.adapter.FileMP3StoreAdapter;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;

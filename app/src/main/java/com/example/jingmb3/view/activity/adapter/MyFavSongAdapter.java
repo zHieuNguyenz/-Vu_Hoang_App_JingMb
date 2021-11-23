@@ -1,9 +1,8 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.model.offline.FavoriteObject;
-import com.example.jingmb3.model.offline.MyMediaPlayer;
-import com.example.jingmb3.model.offline.MySongObject;
+import com.example.jingmb3.view.offline.fragment.IClickItemListener;
 
 import java.util.ArrayList;
 
 public class MyFavSongAdapter  extends RecyclerView.Adapter<MyFavSongAdapter.ViewHolder>{
     private ArrayList<FavoriteObject> ListSongs;
-    private  IClickItemListener iClickItemListener;
+    private IClickItemListener iClickItemListener;
     public interface ClickMoreOption{
         void clickMoreOption(int position);
     }

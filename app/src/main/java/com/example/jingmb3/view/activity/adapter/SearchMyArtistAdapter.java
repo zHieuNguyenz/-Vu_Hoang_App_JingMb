@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.adapter;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
-import com.example.jingmb3.model.offline.MyAlbumObject;
 import com.example.jingmb3.model.offline.MyArtistObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
 
@@ -41,6 +39,10 @@ public class SearchMyArtistAdapter extends RecyclerView.Adapter<SearchMyArtistAd
         listArtistSearch=listArtists;
         mContext=context;
         notifyDataSetChanged();
+    }
+
+    public void setListArtists(ArrayList<MyArtistObject> listArtists) {
+        ListArtists = listArtists;
     }
 
     public ArrayList<MyArtistObject> getListArtists() {
@@ -76,7 +78,7 @@ public class SearchMyArtistAdapter extends RecyclerView.Adapter<SearchMyArtistAd
             Bitmap bitmap= BitmapFactory.decodeByteArray(myArtistObject.getImageArtist(),0,
                     myArtistObject.getImageArtist().length);
             holder.imgArtist.setImageBitmap(bitmap);
-        }
+        } else holder.imgArtist.setImageResource(R.drawable.icon_artist);
         holder.item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

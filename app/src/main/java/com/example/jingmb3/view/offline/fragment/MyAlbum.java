@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentMyAlbumBinding;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
@@ -38,10 +38,12 @@ import com.example.jingmb3.model.offline.MySongsDatabase;
 import com.example.jingmb3.view.offline.activity.AddMyAlbum;
 import com.example.jingmb3.view.offline.activity.EditMyAlbum;
 import com.example.jingmb3.view.offline.activity.SongsOfAlbum;
+import com.example.jingmb3.view.activity.adapter.MyAlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 
 public class MyAlbum extends Fragment {
@@ -78,7 +80,7 @@ public class MyAlbum extends Fragment {
             public void onClick(View view) {
                 Intent intent =new Intent(getActivity(), AddMyAlbum.class);
                 startActivityForResult(intent,REQUEST_ADD_ALBUM);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
             }
         });
 
@@ -142,7 +144,7 @@ public class MyAlbum extends Fragment {
                 Intent intent=new Intent(getActivity(), EditMyAlbum.class);
                 intent.putExtra("IdAlbum",myListAlbum.get(position).getId_album());
                 startActivityForResult(intent,requestEdit);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
                 dialog.dismiss();
             }
         });
@@ -170,6 +172,7 @@ public class MyAlbum extends Fragment {
                 MyMediaPlayer.getInstance().setCheckSongAlbum(true);
                 MyMediaPlayer.getInstance().setIdAlbum(myListAlbum.get(position).getId_album());
                 MyMediaPlayer.getInstance().playAudioFile(getContext(),myListSong.get(0).getLinkSong(), 0);
+                MyMediaPlayer.getInstance().Start();
             }
             else{
                 if(!MyMediaPlayer.getInstance().isCheckStopMedia())
@@ -180,6 +183,7 @@ public class MyAlbum extends Fragment {
                 MyMediaPlayer.getInstance().setCheckFavSong(false);
                 MyMediaPlayer.getInstance().setIdAlbum(myListAlbum.get(position).getId_album());
                 MyMediaPlayer.getInstance().playAudioFile(getContext(),myListSong.get(0).getLinkSong(), 0);
+                MyMediaPlayer.getInstance().Start();
             }
             MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
             myMusic.loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
@@ -233,6 +237,7 @@ public class MyAlbum extends Fragment {
     public void loadData(){
         myListAlbum= (ArrayList<MyAlbumObject>) MyAlbumDatabase.getInstance(getContext()).myAlbumDAO().getMyAlbum();
         Arrange();
+        ListSearch.getInstance().setListAlbum(myListAlbum);
         binding.countAlbum.setText(myListAlbum.size()+" Album");
         myAlbumAdapter.setData(myListAlbum);
     }

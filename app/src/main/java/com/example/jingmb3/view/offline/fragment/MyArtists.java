@@ -1,6 +1,5 @@
 package com.example.jingmb3.view.offline.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -12,18 +11,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentMyArtistsBinding;
-import com.example.jingmb3.model.offline.MyAlbumObject;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyArtistDatabase;
 import com.example.jingmb3.model.offline.MyArtistObject;
-import com.example.jingmb3.model.offline.MyMediaPlayer;
-import com.example.jingmb3.model.offline.MySongObject;
-import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.offline.activity.AddMySong;
 import com.example.jingmb3.view.offline.activity.SongOfMyArtist;
+import com.example.jingmb3.view.activity.adapter.MyArtistAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,15 +50,16 @@ public class MyArtists extends Fragment {
                 Intent intent=new Intent(getActivity(), SongOfMyArtist.class);
                 intent.putExtra("Id",IdArtist);
                 startActivity(intent);
-                getActivity().overridePendingTransition(R.anim.slide_up_in,R.anim.slide_up_out);
+                getActivity().overridePendingTransition(R.anim.slide_left_in,R.anim.slide_up_out);
             }
         });
     }
     private void LoadUI(){
         ListMyArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(getContext()).myArtistDAO().getMyArtist();
-        if(ListMyArtist.isEmpty())  binding.countArtist.setText("0 Nghệ sĩ");
+        if(ListMyArtist==null)  binding.countArtist.setText("0 Nghệ sĩ");
         else binding.countArtist.setText(ListMyArtist.size()+" Nghệ sĩ");
         Arrange();
+        ListSearch.getInstance().setListArtist(ListMyArtist);
         myArtistAdapter.setData(ListMyArtist);
     }
     public void Arrange(){

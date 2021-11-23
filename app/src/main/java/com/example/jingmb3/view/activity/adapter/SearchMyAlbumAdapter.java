@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.adapter;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.model.offline.MyAlbumObject;
-import com.example.jingmb3.model.offline.MySongObject;
 
 import java.util.ArrayList;
 
@@ -32,6 +31,11 @@ public class SearchMyAlbumAdapter extends RecyclerView.Adapter<SearchMyAlbumAdap
         }
         return Instance;
     }
+
+    public void setListAlbum(ArrayList<MyAlbumObject> listAlbum) {
+        this.listAlbum = listAlbum;
+    }
+
     public void setData(ArrayList<MyAlbumObject> listAlbum){
         this.listAlbum=listAlbum;
         listAlbumSearch=listAlbum;

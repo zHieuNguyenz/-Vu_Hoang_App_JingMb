@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.content.Context;
 
@@ -13,6 +13,11 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.jingmb3.model.offline.FavoriteDatabase;
 import com.example.jingmb3.model.offline.FavoriteObject;
+import com.example.jingmb3.view.offline.fragment.MyAlbum;
+import com.example.jingmb3.view.offline.fragment.MyArtists;
+import com.example.jingmb3.view.offline.fragment.MyFavoriteSongs;
+import com.example.jingmb3.view.offline.fragment.MyMusic;
+import com.example.jingmb3.view.offline.fragment.MySongs;
 
 import java.util.ArrayList;
 

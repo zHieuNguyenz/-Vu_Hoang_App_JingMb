@@ -1,4 +1,4 @@
-package com.example.jingmb3.view.offline.fragment;
+package com.example.jingmb3.view.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.model.offline.MyAlbumObject;
-import com.example.jingmb3.model.offline.MySongObject;
+import com.example.jingmb3.view.offline.fragment.ClickItemAlbum;
 
 import java.util.ArrayList;
 

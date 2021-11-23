@@ -4,30 +4,23 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivitySearchBinding;
+import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
-import com.example.jingmb3.model.offline.MySongObject;
-import com.example.jingmb3.model.offline.MySongsDatabase;
-import com.example.jingmb3.view.offline.adapter.SearchMyAlbumAdapter;
-import com.example.jingmb3.view.offline.adapter.SearchMyArtistAdapter;
-import com.example.jingmb3.view.offline.adapter.SearchMySongAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMyAlbumAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMyArtistAdapter;
+import com.example.jingmb3.view.activity.adapter.SearchMySongAdapter;
 import com.example.jingmb3.view.offline.fragment.SearchMyAlbum;
 import com.example.jingmb3.view.offline.fragment.SearchMyArtist;
 import com.example.jingmb3.view.offline.fragment.SearchMySong;
 import com.google.android.material.navigation.NavigationBarView;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class Search extends AppCompatActivity {
 
@@ -47,11 +40,14 @@ public class Search extends AppCompatActivity {
         TextView searchEditText=binding.search.findViewById(id);
         searchEditText.setTextColor(getResources().getColor(R.color.white));
         searchEditText.setHintTextColor(getResources().getColor(R.color.gray));
+        ListSearch.getInstance().setCheckSearch(true);
         binding.cancleSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                ListSearch.getInstance().setCheckSearch(false);
+                binding.search.clearFocus();
                 finish();
-                overridePendingTransition(0,0);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
 
@@ -116,7 +112,7 @@ public class Search extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(0,0);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 
     @Override

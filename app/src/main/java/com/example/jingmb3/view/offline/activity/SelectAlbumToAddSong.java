@@ -13,11 +13,10 @@ import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivitySelectAlbumToAddSongBinding;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
+import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
 import com.example.jingmb3.view.offline.fragment.ClickItemAlbum;
-import com.example.jingmb3.view.offline.fragment.MyAlbumAdapter;
-import com.example.jingmb3.view.offline.fragment.SongsOfAlbumAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +37,7 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
-                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+                overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
             }
         });
         selectAlbumAdapter=new SelectAlbumAdapter(myListAlbum, new ClickItemAlbum() {
@@ -64,17 +63,42 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
             }
             IdSongList=myAlbumObject.getId_song();
             IdSongList.add(String.valueOf(IdSong));
-            AddIdAlbum(myListAlbum.get(position).getId_album());
         }
         else IdSongList.add(String.valueOf(IdSong));
         myAlbumObject.setId_song(IdSongList);
         MyAlbumDatabase.getInstance(this).myAlbumDAO().editAlbum(myAlbumObject);
+
+        if(MyMediaPlayer.getInstance().isCheckSongAlbum()){
+            if(myAlbumObject.getId_album()==MyMediaPlayer.getInstance().getIdAlbum()){
+                ArrayList<MySongObject> arrayList=MyMediaPlayer.getInstance().getListPlaySong();
+                arrayList.add(MySongsDatabase.getInstance(this).mySongsDAO().getMySongByID(IdSong));
+                ArrangeSong(arrayList);
+                for(int i=0;i<arrayList.size();i++){
+                    if(arrayList.get(i).getId_song()==MyMediaPlayer.getInstance().getIdSong()){
+                        MyMediaPlayer.getInstance().setPosition(i);
+                        break;
+                    }
+                }
+                MyMediaPlayer.getInstance().setListPlaySong(arrayList);
+            }
+        }
+
         Intent intent=new Intent();
         intent.putExtra("name album",myAlbumObject.getNameAlbum());
         setResult(Activity.RESULT_OK,intent);
         finish();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
+
+    private void ArrangeSong(ArrayList<MySongObject> arrayList) {
+        Collections.sort(arrayList, new Comparator<MySongObject>() {
+            @Override
+            public int compare(MySongObject mySongObject, MySongObject t1) {
+                return mySongObject.getNameSong().compareToIgnoreCase(t1.getNameSong());
+            }
+        });
+    }
+
     public void Arrange(){
         Collections.sort(myListAlbum, new Comparator<MyAlbumObject>() {
             @Override
@@ -84,26 +108,6 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
         });
     }
 
-    public void AddIdAlbum(int IdAlbum){
-        ArrayList<MySongObject> MyListSong;
-        MyListSong=new ArrayList<>();
-        MyListSong= (ArrayList<MySongObject>) MySongsDatabase.getInstance(this).mySongsDAO().getListSong();
-        MySongObject mySongObject = null;
-        for(MySongObject mySongObject1:MyListSong){
-            if (mySongObject1.getId_song()==IdSong){
-                mySongObject=mySongObject1;
-                break;
-            }
-        }
-        ArrayList<String> IdAlbumList;
-        IdAlbumList=new ArrayList<>();
-        if(mySongObject.getId_album()!=null)  {
-            IdAlbumList=mySongObject.getId_album();
-            IdAlbumList.add(String.valueOf(IdAlbum));
-        }
-        mySongObject.setId_album(IdAlbumList);
-        MySongsDatabase.getInstance(this).mySongsDAO().editSong(mySongObject);
-    }
 
     public void loadData(){
         myListAlbum=new ArrayList<>();
@@ -115,6 +119,6 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
+        overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);
     }
 }
