@@ -9,6 +9,8 @@
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@drawable/bg_scrollbar"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:id="@+id/rv_listsong_search"/>

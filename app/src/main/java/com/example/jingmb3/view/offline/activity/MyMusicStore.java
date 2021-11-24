@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.widget.Toast;
 
 import com.example.jingmb3.databinding.ActivityMyMusicStoreBinding;
+import com.example.jingmb3.view.activity.LoadingDialog;
 import com.example.jingmb3.view.offline.fragment.ClickItemFileMP3;
 import com.example.jingmb3.view.activity.adapter.FileMP3StoreAdapter;
 import com.karumi.dexter.Dexter;
@@ -107,5 +108,6 @@ public class MyMusicStore extends AppCompatActivity {
             myListSong.add(items[i]);
         }
         fileMP3StoreAdapter.setData(myListSong);
+        LoadingDialog.getInstance().StopDialog();
     }
 }

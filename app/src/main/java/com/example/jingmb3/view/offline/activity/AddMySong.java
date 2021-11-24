@@ -1,6 +1,7 @@
 package com.example.jingmb3.view.offline.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.Loader;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import com.example.jingmb3.model.offline.MyArtistObject;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
+import com.example.jingmb3.view.activity.LoadingDialog;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,6 +50,7 @@ public class AddMySong extends AppCompatActivity {
         binding.uploadUri.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                LoadingDialog.getInstance().StartDialog(AddMySong.this);
                 Intent intent = new Intent(AddMySong.this,MyMusicStore.class);
                 startActivityForResult(intent,REQUEST_UPFILE);
             }
