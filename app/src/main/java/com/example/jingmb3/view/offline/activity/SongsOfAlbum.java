@@ -188,6 +188,7 @@ public class SongsOfAlbum extends AppCompatActivity {
                     favoriteObject=new FavoriteObject(nameSong,nameArtist,imgSong,uriSong,IdSong);
                     FavoriteDatabase.getInstance(SongsOfAlbum.this).favoriteDAO().insertSong(favoriteObject);
                     Toast.makeText(SongsOfAlbum.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         FavList=MyMediaPlayer.getInstance().getListPlaySong();
                         FavList.add(ListSongOfAlbum.get(Position));
@@ -207,6 +208,7 @@ public class SongsOfAlbum extends AppCompatActivity {
                             (ListSongOfAlbum.get(Position).getId_song());
                     FavoriteDatabase.getInstance(SongsOfAlbum.this).favoriteDAO().deleteSong(favoriteObject);
                     Toast.makeText(SongsOfAlbum.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         if(MyMediaPlayer.getInstance().getIdSong()==ListSongOfAlbum.get(Position).getId_song()){
                             MyMediaPlayer.getInstance().stopAudioFile();
@@ -271,6 +273,7 @@ public class SongsOfAlbum extends AppCompatActivity {
                     ListSearch.getInstance().setListAlbum(listAlbum);
                 }
                 loadUISong();
+                MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);
                 Toast.makeText(SongsOfAlbum.this,"Đã xóa bài hát khỏi Album!",Toast.LENGTH_SHORT).show();
                 if(MyMediaPlayer.getInstance().isCheckSongAlbum()){
                     if(IdAlbum==MyMediaPlayer.getInstance().getIdAlbum()){

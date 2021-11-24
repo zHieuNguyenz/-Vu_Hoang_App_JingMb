@@ -17,6 +17,7 @@ import com.example.jingmb3.databinding.FragmentMyArtistsBinding;
 import com.example.jingmb3.model.offline.ListSearch;
 import com.example.jingmb3.model.offline.MyArtistDatabase;
 import com.example.jingmb3.model.offline.MyArtistObject;
+import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.view.offline.activity.SongOfMyArtist;
 import com.example.jingmb3.view.activity.adapter.MyArtistAdapter;
 
@@ -74,6 +75,9 @@ public class MyArtists extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        LoadUI();
+        if(MyMediaPlayer.getInstance().isCheckUpdateArtist()){
+            MyMediaPlayer.getInstance().setCheckUpdateArtist(false);
+            LoadUI();
+        }
     }
 }

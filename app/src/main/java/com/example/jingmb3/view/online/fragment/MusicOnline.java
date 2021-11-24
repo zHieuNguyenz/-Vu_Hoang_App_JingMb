@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 
 import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.FragmentMusicOnlineBinding;
+import com.example.jingmb3.view.offline.fragment.MyMusic;
 import com.example.jingmb3.view.online.fragment.ViewPagerAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MusicOnline extends Fragment {
-
     private FragmentMusicOnlineBinding binding;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

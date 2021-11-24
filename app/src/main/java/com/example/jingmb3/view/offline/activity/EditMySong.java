@@ -211,6 +211,7 @@ public class EditMySong extends AppCompatActivity {
             if(ListSearch.getInstance().isCheckSearch()){
                 ListSearch.getInstance().setCheckUpdateListArtist(true);
             }
+            MyMediaPlayer.getInstance().setCheckUpdateArtist(true);
             List<String> ListNameArtist= MyArtistDatabase.getInstance(this).myArtistDAO()
                     .getListNameArtist();
             if(!ListNameArtist.contains(nameArtist)){
@@ -221,19 +222,15 @@ public class EditMySong extends AppCompatActivity {
                 ArrangeArtist();
                 ListSearch.getInstance().setListArtist(listArtist);
             }
-            else{
-                ListNameArtist= MySongsDatabase.getInstance(this).mySongsDAO()
-                        .getListArtist();
-                if(!ListNameArtist.contains(NameArtist)){
-                    MyArtistObject myArtistObject=new MyArtistObject();
-                    myArtistObject=MyArtistDatabase.getInstance(this).myArtistDAO().getArtistByName(NameArtist);
-                    MyArtistDatabase.getInstance(this).myArtistDAO().deleteArtist(myArtistObject);
-                    listArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(this).myArtistDAO().getMyArtist();
-                    ArrangeArtist();
-                    ListSearch.getInstance().setListArtist(listArtist);
-                }
+            ListNameArtist=MySongsDatabase.getInstance(this).mySongsDAO().getListArtist();
+            if(!ListNameArtist.contains(NameArtist)){
+                MyArtistDatabase.getInstance(this).myArtistDAO().deleteArtist(MyArtistDatabase.getInstance(this).myArtistDAO().getArtistByName(NameArtist));
+                listArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(this).myArtistDAO().getMyArtist();
+                ArrangeArtist();
+                ListSearch.getInstance().setListArtist(listArtist);
             }
         }
+        MyMediaPlayer.getInstance().setCheckUpdateSong(true);
         setResult(Activity.RESULT_OK);
         finish();
         overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);

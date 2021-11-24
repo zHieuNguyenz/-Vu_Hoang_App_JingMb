@@ -22,6 +22,7 @@ import com.example.jingmb3.databinding.FragmentMyMusicBinding;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
+import com.example.jingmb3.view.activity.LoadingDialog;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
 import com.example.jingmb3.view.activity.adapter.MyMusicViewPagerAdapter;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -35,7 +36,6 @@ import java.util.Random;
 public class MyMusic extends Fragment {
 
     private FragmentMyMusicBinding binding;
-
     private int position=0;
     private ArrayList<MySongObject> myListSong;
     private MySongObject mySongObject;

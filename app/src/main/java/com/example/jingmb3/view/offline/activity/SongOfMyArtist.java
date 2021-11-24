@@ -80,6 +80,7 @@ public class SongOfMyArtist extends AppCompatActivity {
                             .getMyFavSongByID(ID);
                     FavoriteDatabase.getInstance(SongOfMyArtist.this).favoriteDAO().deleteSong(favoriteObject);
                     Toast.makeText(SongOfMyArtist.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         MySongObject mySongObject=MySongsDatabase.getInstance(SongOfMyArtist.this).mySongsDAO()
                                 .getMySongByID(ID);
@@ -121,6 +122,7 @@ public class SongOfMyArtist extends AppCompatActivity {
                             mySongObject.getImageSong(),mySongObject.getLinkSong(),mySongObject.getId_song());
                     FavoriteDatabase.getInstance(SongOfMyArtist.this).favoriteDAO().insertSong(favoriteObject);
                     Toast.makeText(SongOfMyArtist.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         FavList=MyMediaPlayer.getInstance().getListPlaySong();
                         FavList.add(mySongObject);
@@ -216,6 +218,7 @@ public class SongOfMyArtist extends AppCompatActivity {
         }
         myArtistObject.setImageArtist(ImageView_to_Byte());
         MyArtistDatabase.getInstance(this).myArtistDAO().editArtist(myArtistObject);
+        MyMediaPlayer.getInstance().setCheckUpdateArtist(true);
         if(ListSearch.getInstance().isCheckSearch()){
             ListSearch.getInstance().setCheckUpdateListArtist(true);
             listArtist= (ArrayList<MyArtistObject>) MyArtistDatabase.getInstance(this).myArtistDAO().getMyArtist();

@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private long backPressedTime;
     private Toast toast;
     private ActivityMainBinding binding;
+    FragmentTransaction fragmentTransaction;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+        LoadingDialog.getInstance().StartDialog(this);
     }
 
     @Override
@@ -67,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if(id==R.id.MusicOnlineMenu)
         {
             if(mCurrentFragment!=MUSIC_ONLINE){
+                LoadingDialog.getInstance().StartDialog(this);
                 replaceFragment(new MusicOnline());
                 mCurrentFragment=MUSIC_ONLINE;
             }
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }  else if (id==R.id.MyMusicMenu)
         {
             if(mCurrentFragment!=MY_MUSIC){
+                LoadingDialog.getInstance().StartDialog(this);
                 replaceFragment(new MyMusic());
                 mCurrentFragment=MY_MUSIC;
             }
@@ -83,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void replaceFragment(Fragment fragment){
-        FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+        fragmentTransaction=getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frame_content,fragment);
         fragmentTransaction.commit();
     }

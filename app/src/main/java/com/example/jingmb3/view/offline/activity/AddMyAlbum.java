@@ -15,6 +15,7 @@ import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivityAddMyAlbumBinding;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
+import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
 import com.example.jingmb3.model.offline.MySongsDatabase;
 
@@ -87,6 +88,7 @@ public class AddMyAlbum extends AppCompatActivity {
         myAlbumObject.setNameAlbum(name);
         myAlbumObject.setImageAlbum(ImageView_to_Byte());
         MyAlbumDatabase.getInstance(this).myAlbumDAO().insertAlbum(myAlbumObject);
+        MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);
         setResult(Activity.RESULT_OK);
         finish();
         overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);

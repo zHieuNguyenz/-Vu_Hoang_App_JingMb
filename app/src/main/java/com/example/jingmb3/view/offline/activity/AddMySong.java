@@ -120,6 +120,7 @@ public class AddMySong extends AppCompatActivity {
                 }
             }
         }
+        MyMediaPlayer.getInstance().setCheckUpdateSong(true);
         setResult(Activity.RESULT_OK);
         finish();
         overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);

@@ -85,6 +85,7 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
 
         Intent intent=new Intent();
         intent.putExtra("name album",myAlbumObject.getNameAlbum());
+        MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);
         setResult(Activity.RESULT_OK,intent);
         finish();
         overridePendingTransition(R.anim.slide_down_in,R.anim.slide_right_out);

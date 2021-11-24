@@ -23,7 +23,10 @@ public class MyMediaPlayer {
     boolean checkRandom=false;
     boolean checkRepeat=false;
     boolean checkSongAlbum=false;
-
+    boolean checkUpdateSong=false;
+    boolean checkUpdateAlbum=false;
+    boolean checkUpdateArtist=false;
+    boolean checkUpdateFavorite=false;
 
     public static MyMediaPlayer getInstance(){
         if(Instance==null){
@@ -158,4 +161,35 @@ public class MyMediaPlayer {
         this.checkFavSong = checkFavSong;
     }
 
+    public boolean isCheckUpdateAlbum() {
+        return checkUpdateAlbum;
+    }
+
+    public void setCheckUpdateAlbum(boolean checkUpdateAlbum) {
+        this.checkUpdateAlbum = checkUpdateAlbum;
+    }
+
+    public boolean isCheckUpdateSong() {
+        return checkUpdateSong;
+    }
+
+    public void setCheckUpdateSong(boolean checkUpdateSong) {
+        this.checkUpdateSong = checkUpdateSong;
+    }
+
+    public boolean isCheckUpdateArtist() {
+        return checkUpdateArtist;
+    }
+
+    public void setCheckUpdateArtist(boolean checkUpdateArtist) {
+        this.checkUpdateArtist = checkUpdateArtist;
+    }
+
+    public boolean isCheckUpdateFavorite() {
+        return checkUpdateFavorite;
+    }
+
+    public void setCheckUpdateFavorite(boolean checkUpdateFavorite) {
+        this.checkUpdateFavorite = checkUpdateFavorite;
+    }
 }

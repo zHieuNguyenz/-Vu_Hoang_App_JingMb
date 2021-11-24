@@ -221,6 +221,7 @@ public class MySongs extends Fragment  {
                     favoriteObject=new FavoriteObject(nameSong,nameArtist,imgSong,uriSong,IdSong);
                     FavoriteDatabase.getInstance(getContext()).favoriteDAO().insertSong(favoriteObject);
                     Toast.makeText(getContext(),"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
                         FavList=MyMediaPlayer.getInstance().getListPlaySong();
@@ -242,6 +243,7 @@ public class MySongs extends Fragment  {
                             (myListSong.get(position).getId_song());
                     FavoriteDatabase.getInstance(getContext()).favoriteDAO().deleteSong(favoriteObject);
                     Toast.makeText(getContext(),"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         if(MyMediaPlayer.getInstance().getIdSong()==myListSong.get(position).getId_song()){
                             MyMediaPlayer.getInstance().stopAudioFile();
@@ -458,6 +460,10 @@ public class MySongs extends Fragment  {
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        if(MyMediaPlayer.getInstance().isCheckUpdateSong()){
+            loadData();
+            MyMediaPlayer.getInstance().setCheckUpdateSong(false);
+        }
+
     }
 }

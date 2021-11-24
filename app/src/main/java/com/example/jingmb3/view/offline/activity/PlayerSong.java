@@ -8,6 +8,7 @@ import androidx.palette.graphics.Palette;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -316,8 +317,18 @@ public class PlayerSong extends AppCompatActivity {
             public void onGenerated(@Nullable Palette palette) {
                 int color=palette.getDominantColor(1);
                 binding.screenPlay.setBackgroundColor(color);
+                binding.screenPlay.getBackground().setAlpha(185);
+                int color1=((ColorDrawable) binding.screenPlay.getBackground()).getColor();
                 binding.screenPlay.getBackground().setAlpha(230);
-                if(isColorDark(((ColorDrawable) binding.screenPlay.getBackground()).getColor())) {
+                int color2=((ColorDrawable) binding.screenPlay.getBackground()).getColor();
+                int[] colors = {color2,color1};
+
+
+                GradientDrawable gd = new GradientDrawable(
+                        GradientDrawable.Orientation.BOTTOM_TOP, colors);
+
+                binding.screenPlay.setBackground(gd);
+                if(isColorDark(color2)) {
                     binding.playBtn.setColorFilter(Color.WHITE);
                     binding.nextBtn.setColorFilter(Color.WHITE);
                     binding.prevBtn.setColorFilter(Color.WHITE);
@@ -381,6 +392,7 @@ public class PlayerSong extends AppCompatActivity {
                     binding.favBtn.setImageResource(R.drawable.ic_favorite_border);
                     fav=false;
                     Toast.makeText(PlayerSong.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
                         if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
                         for(MySongObject mySongObject:myListSong){
@@ -394,6 +406,7 @@ public class PlayerSong extends AppCompatActivity {
                         if(myListSong.size()==0) {
                             MyMediaPlayer.getInstance().setCheckFavSong(false);
                         }
+                        binding.seekBar.clearFocus();
                         finish();
                         overridePendingTransition(0, R.anim.slide_down_out);
                     }
@@ -410,6 +423,7 @@ public class PlayerSong extends AppCompatActivity {
                     binding.favBtn.setImageResource(R.drawable.ic_favorite);
                     fav=true;
                     Toast.makeText(PlayerSong.this,"Đã thêm vào danh sách yêu thích!",Toast.LENGTH_SHORT).show();
+                    MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                 }
             }
         });

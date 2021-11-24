@@ -258,6 +258,9 @@ public class MyAlbum extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        if(MyMediaPlayer.getInstance().isCheckUpdateAlbum()){
+            MyMediaPlayer.getInstance().setCheckUpdateAlbum(false);
+            loadData();
+        }
     }
 }

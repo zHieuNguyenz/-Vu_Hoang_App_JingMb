@@ -31,6 +31,7 @@ import com.example.jingmb3.model.offline.FavoriteDatabase;
 import com.example.jingmb3.model.offline.FavoriteObject;
 import com.example.jingmb3.model.offline.MyMediaPlayer;
 import com.example.jingmb3.model.offline.MySongObject;
+import com.example.jingmb3.view.activity.LoadingDialog;
 import com.example.jingmb3.view.offline.activity.EditMySong;
 import com.example.jingmb3.view.offline.activity.PlayerSong;
 import com.example.jingmb3.view.offline.activity.SelectAlbumToAddSong;
@@ -82,6 +83,7 @@ public class MyFavoriteSongs extends Fragment {
                 OpenDialogOption(position);
             }
         });
+        LoadingDialog.getInstance().StopDialog();
     }
 
     private void OpenDialogOption(int position) {
@@ -216,6 +218,10 @@ public class MyFavoriteSongs extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        if(MyMediaPlayer.getInstance().isCheckUpdateFavorite()){
+            loadData();
+            MyMediaPlayer.getInstance().setCheckUpdateFavorite(false);
+        }
+
     }
 }

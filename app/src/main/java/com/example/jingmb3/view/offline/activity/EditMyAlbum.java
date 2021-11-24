@@ -16,6 +16,7 @@ import com.example.jingmb3.R;
 import com.example.jingmb3.databinding.ActivityEditMyAlbumBinding;
 import com.example.jingmb3.model.offline.MyAlbumDatabase;
 import com.example.jingmb3.model.offline.MyAlbumObject;
+import com.example.jingmb3.model.offline.MyMediaPlayer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -77,6 +78,7 @@ public class EditMyAlbum extends AppCompatActivity {
         myAlbumObject.setNameAlbum(nameAlbum);
         myAlbumObject.setImageAlbum(ImageView_to_Byte());
         MyAlbumDatabase.getInstance(this).myAlbumDAO().editAlbum(myAlbumObject);
+        MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);
         setResult(Activity.RESULT_OK);
         finish();
         overridePendingTransition(R.anim.slide_down_in,R.anim.slide_down_out);
