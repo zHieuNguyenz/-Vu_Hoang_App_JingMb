@@ -27,6 +27,7 @@ public class MyMediaPlayer {
     boolean checkUpdateAlbum=false;
     boolean checkUpdateArtist=false;
     boolean checkUpdateFavorite=false;
+    boolean checkStopFavSong=false;
 
     public static MyMediaPlayer getInstance(){
         if(Instance==null){
@@ -191,5 +192,13 @@ public class MyMediaPlayer {
 
     public void setCheckUpdateFavorite(boolean checkUpdateFavorite) {
         this.checkUpdateFavorite = checkUpdateFavorite;
+    }
+
+    public boolean isCheckStopFavSong() {
+        return checkStopFavSong;
+    }
+
+    public void setCheckStopFavSong(boolean checkStopFavSong) {
+        this.checkStopFavSong = checkStopFavSong;
     }
 }

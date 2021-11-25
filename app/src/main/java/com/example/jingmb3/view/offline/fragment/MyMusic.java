@@ -369,6 +369,10 @@ public class MyMusic extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if(MyMediaPlayer.getInstance().isCheckStopFavSong()){
+            if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
+            MyMediaPlayer.getInstance().setCheckStopFavSong(false);
+        }
         loadMiniPlayer(MyMediaPlayer.getInstance().getPosition());
         if(MyMediaPlayer.getInstance().getMediaPlayer()!=null)
         mediaComplete();

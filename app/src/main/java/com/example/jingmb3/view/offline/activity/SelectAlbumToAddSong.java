@@ -83,6 +83,8 @@ public class SelectAlbumToAddSong extends AppCompatActivity {
             }
         }
 
+        MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);
+
         Intent intent=new Intent();
         intent.putExtra("name album",myAlbumObject.getNameAlbum());
         MyMediaPlayer.getInstance().setCheckUpdateAlbum(true);

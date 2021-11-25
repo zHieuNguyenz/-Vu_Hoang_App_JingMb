@@ -394,7 +394,7 @@ public class PlayerSong extends AppCompatActivity {
                     Toast.makeText(PlayerSong.this,"Đã xóa khỏi danh sách yêu thích!",Toast.LENGTH_SHORT).show();
                     MyMediaPlayer.getInstance().setCheckUpdateFavorite(true);
                     if(MyMediaPlayer.getInstance().isCheckFavSong()){
-                        if(!MyMediaPlayer.getInstance().isCheckStopMedia()) MyMediaPlayer.getInstance().stopAudioFile();
+                        MyMediaPlayer.getInstance().setCheckStopFavSong(true);
                         for(MySongObject mySongObject:myListSong){
                             if(mySongObject.getId_song()==MyMediaPlayer.getInstance().getIdSong()){
                                 myListSong.remove(mySongObject);
@@ -406,7 +406,6 @@ public class PlayerSong extends AppCompatActivity {
                         if(myListSong.size()==0) {
                             MyMediaPlayer.getInstance().setCheckFavSong(false);
                         }
-                        binding.seekBar.clearFocus();
                         finish();
                         overridePendingTransition(0, R.anim.slide_down_out);
                     }

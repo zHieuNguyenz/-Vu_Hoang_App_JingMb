@@ -95,6 +95,7 @@ public class AddMySong extends AppCompatActivity {
 
         MySongObject mySongObject=new MySongObject(name,artist,ImageView_to_Byte(),uri);
         MySongsDatabase.getInstance(this).mySongsDAO().insertSong(mySongObject);
+        MyMediaPlayer.getInstance().setCheckUpdateArtist(true);
 
         if(MyArtistDatabase.getInstance(this).myArtistDAO().getListNameArtist().contains(artist)&&
         MyMediaPlayer.getInstance().isCheckSongArtist()){

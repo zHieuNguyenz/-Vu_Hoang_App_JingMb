@@ -367,6 +367,7 @@ public class MySongs extends Fragment  {
                             MyMediaPlayer.getInstance().setCheckFavSong(false);
                             MyMusic myMusic= (MyMusic) getActivity().getSupportFragmentManager().findFragmentById(R.id.frame_content);
                             MyMediaPlayer.getInstance().setListPlaySong(myListSong);
+                            MyMediaPlayer.getInstance().setPosition(0);
                             myMusic.loadMiniPlayer(0);
                         }
                         else {

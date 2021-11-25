@@ -46,6 +46,7 @@ public class MyFavSongAdapter  extends RecyclerView.Adapter<MyFavSongAdapter.Vie
     public void onBindViewHolder(@NonNull MyFavSongAdapter.ViewHolder holder, @SuppressLint("RecyclerView") int position) {
         final FavoriteObject favoriteObject=ListSongs.get(position);
         holder.nameSong.setText(favoriteObject.getNameSong());
+        holder.nameSong.setSelected(true);
         holder.nameArtist.setText(favoriteObject.getNameArtist());
         if(favoriteObject.getImageSong()!=null){
             Bitmap bitmap= BitmapFactory.decodeByteArray(favoriteObject.getImageSong(),0,favoriteObject.getImageSong().length);
